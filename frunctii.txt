@@ -1,11 +1,11 @@
-1.Fucntie de calculat a review-urilor pe fiecare magazin si facut update in tabele
-2.Functie de calcular procentajul clientilor de au dat review si zilele in care au fost date cele mai bune review-uri
+1.Functie de calculare a review-urilor pe fiecare magazin si facut update in tabele
+2.Functie de calculat procentajul clientilor ce au dat review si zilele in care au fost date cele mai bune review-uri
 3.Functie de cautat cel mai bun magazin/cabinet in functie de serviciul selectat
 4.Functie de cautat cel mai bun magazin/cabinet in functie de serviciul selectat si o perioada de timp selectata de client
 5.Functie de inserat toate serviciile unui magazin/cabinet in tabel
-6.Functie de calculat orle de varf a fiecarui magazin
-7.Functie de ascundere a cuvinteloe urate in review-uri
-8.Functie de calculare a trust faactor
+6.Functie de calculat orele de varf a fiecarui magazin
+7.Functie de ascundere a cuvintelor urate in review-uri
+8.Functie de calculare a trust factor-ului
 9.Functie de calculat statistica pe fiecare scor primit(o stea ,doua ,trei...)
 10.Functie de calculat procentajul clientilor ce au venit la timp
 11.Functie de calculat a timpului mediu per consult la fiecare magazin/cabinet
