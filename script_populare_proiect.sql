@@ -9,7 +9,6 @@ DROP TABLE programari CASCADE CONSTRAINTS
 DROP TABLE recenzii CASCADE CONSTRAINTS
 /
 
-
 CREATE TABLE clienti (
   id INT NOT NULL PRIMARY KEY,
   nume VARCHAR2(15) NOT NULL,
@@ -31,6 +30,7 @@ CREATE TABLE furnizori (
   trust_lvl NUMBER(3),
   created_at DATE,
   updated_at DATE
+)
 /
 
 
@@ -40,8 +40,8 @@ CREATE TABLE servicii (
   tip VARCHAR2(52),
   avg_time DATE,
   created_at DATE,
-  updated_at DATE,
-)
+  updated_at DATE
+  )
 /
 
 CREATE TABLE programari (
@@ -50,10 +50,10 @@ CREATE TABLE programari (
   id_furnizor INT NOT NULL,
   id_serviciu INT NOT NULL,
   data_programare DATE NOT NULL,
-  ora_programare  DATA NOT NULL,
-  atendance BOOLEAN,
+  ora_programare  DATE NOT NULL,
+  atendance VARCHAR2(52),
   created_at DATE,
-  updated_at DATE
+  updated_at DATE,
   CONSTRAINT fk_programari_id_client FOREIGN KEY (id_client) REFERENCES clienti(id),
   CONSTRAINT fk_programari_id_furnizor FOREIGN KEY (id_furnizor) REFERENCES furnizori(id),
   CONSTRAINT fk_programari_id_serviciu FOREIGN KEY (id_serviciu) REFERENCES servicii(id)
@@ -65,7 +65,7 @@ CREATE TABLE recenzii (
   id_client INT NOT NULL,
   id_furnizor INT NOT NULL,
   id_serviciu INT NOT NULL,
-  rating NUMBER(3);
+  rating NUMBER(3),
   created_at DATE,
   updated_at DATE,
   CONSTRAINT fk_recenzii_id_client FOREIGN KEY (id_client) REFERENCES clienti(id),
