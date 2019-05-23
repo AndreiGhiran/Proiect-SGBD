@@ -2,18 +2,22 @@ DROP TABLE clienti CASCADE CONSTRAINTS
 /
 DROP TABLE servicii CASCADE CONSTRAINTS
 /
+
 DROP TABLE furnizori CASCADE CONSTRAINTS
 /
+
 DROP TABLE programari CASCADE CONSTRAINTS
 /
+
 DROP TABLE recenzii CASCADE CONSTRAINTS
 /
+
 
 CREATE TABLE clienti (
   id INT NOT NULL PRIMARY KEY,
   nume VARCHAR2(15) NOT NULL,
   prenume VARCHAR2(30) NOT NULL,
-  telefon NUMBER NOT NULL,
+  telefon VARCHAR(10),
   trust NUMBER,
   created_at DATE,
   updated_at DATE
@@ -82,15 +86,15 @@ DECLARE
   lista_prenume_fete varr := varr('Adina','Alexandra','Alina','Ana','Anca','Anda','Andra','Andreea','Andreia','Antonia','Bianca','Camelia','Claudia','Codrina','Cristina','Daniela','Daria','Delia','Denisa','Diana','Ecaterina','Elena','Eleonora','Elisa','Ema','Emanuela','Emma','Gabriela','Georgiana','Ileana','Ilona','Ioana','Iolanda','Irina','Iulia','Iuliana','Larisa','Laura','Loredana','Madalina','Malina','Manuela','Maria','Mihaela','Mirela','Monica','Oana','Paula','Petruta','Raluca','Sabina','Sanziana','Simina','Simona','Stefana','Stefania','Tamara','Teodora','Theodora','Vasilica','Xena');
   lista_prenume_baieti varr := varr('Adrian','Alex','Alexandru','Alin','Andreas','Andrei','Aurelian','Beniamin','Bogdan','Camil','Catalin','Cezar','Ciprian','Claudiu','Codrin','Constantin','Corneliu','Cosmin','Costel','Cristian','Damian','Dan','Daniel','Danut','Darius','Denise','Dimitrie','Dorian','Dorin','Dragos','Dumitru','Eduard','Elvis','Emil','Ervin','Eugen','Eusebiu','Fabian','Filip','Florian','Florin','Gabriel','George','Gheorghe','Giani','Giulio','Iaroslav','Ilie','Ioan','Ion','Ionel','Ionut','Iosif','Irinel','Iulian','Iustin','Laurentiu','Liviu','Lucian','Marian','Marius','Matei','Mihai','Mihail','Nicolae','Nicu','Nicusor','Octavian','Ovidiu','Paul','Petru','Petrut','Radu','Rares','Razvan','Richard','Robert','Roland','Rolland','Romanescu','Sabin','Samuel','Sebastian','Sergiu','Silviu','Stefan','Teodor','Teofil','Theodor','Tudor','Vadim','Valentin','Valeriu','Vasile','Victor','Vlad','Vladimir','Vladut');
   lista_nume_furnizori varr := varr('A','B','C','D','E');
-  lista_servicii := varr('A','B','C');
-  lista_tip varr :=('A','B','C','D');
-  lista_tip_servi varr :=('A','B','C','D');
+  lista_servicii varr := varr('A','B','C');
+  lista_tip varr := varr('A','B','C','D');
+  lista_tip_servi varr := varr('A','B','C','D');
   
   v_nume VARCHAR2(255);
   v_prenume VARCHAR2(255);
   v_prenume1 VARCHAR2(255);
   v_prenume2 VARCHAR2(255);
-  v_matr VARCHAR2(6);
+  v_matr VARCHAR2(10);
   v_matr_aux VARCHAR2(6);
   v_temp int;
   v_temp1 int;
@@ -101,14 +105,16 @@ DECLARE
   v_hour DATE;
   v_avg DATE;
   v_temp3 int;
-  v_trust NUMBER;
+  v_trust NUMBER(3);
   v_client int;
   v_furniz int;
   v_serv int;
+  v_index int;
   v_rating NUMBER(3);
   v_temp_date date;
 BEGIN
 
+  --populare clienti
   FOR v_i IN 1..1000 LOOP
      v_nume := lista_nume(TRUNC(DBMS_RANDOM.VALUE(0,lista_nume.count))+1);
       IF (DBMS_RANDOM.VALUE(0,100)<50) THEN      
@@ -136,37 +142,41 @@ BEGIN
       
       
      LOOP
-         v_matr := 0 || CHR(FLOOR(DBMS_RANDOM.VALUE(0,9))) ||CHR(FLOOR(DBMS_RANDOM.VALUE(0,9))) || FLOOR(DBMS_RANDOM.VALUE(0,9)) || FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9));
+         v_matr := '0' || CHR(FLOOR(DBMS_RANDOM.VALUE(0,9))) ||CHR(FLOOR(DBMS_RANDOM.VALUE(0,9))) || FLOOR(DBMS_RANDOM.VALUE(0,9)) || FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9));
           v_trust := TRUNC(DBMS_RANDOM.VALUE(0,10));
          select count(*) into v_temp from clienti where telefon = v_matr and trust=v_trust;
          exit when v_temp=0;
       END LOOP;
 
   insert into clienti values(v_i, v_nume, v_prenume,v_matr ,v_trust , sysdate, sysdate);
+   END LOOP; 
+   -- sfarsit populare clienti
+   
+   --inceput populare firnizori
+   FOR v_i IN 1..200 LOOP
+     v_nume := lista_nume_furnizori(TRUNC(DBMS_RANDOM.VALUE(0,lista_nume_furnizori.count))+1);
+     v_prenume := lista_tip_servi(TRUNC(DBMS_RANDOM.VALUE(0,lista_tip_servi.count))+1);
+     v_trust := TRUNC(DBMS_RANDOM.VALUE(0,10));
+     v_des := TO_DATE('00:00','HH24:MI')+TRUNC(DBMS_RANDOM.VALUE(7,14))/24; 
+     v_inc := v_des+(8/24)+1/24;
+     
+     insert into furnizori values(v_i,v_nume,v_des,v_inc,v_prenume,v_trust,sysdate,sysdate);
+   end loop;
+   --sfarsit populare furnizori
+   
+   --inceput populare servicii
+   FOR v_i IN 1..200 LOOP
+    v_nume := lista_servicii(TRUNC(DBMS_RANDOM.VALUE(0,lista_servicii.count))+1);
+    v_prenume := lista_tip(TRUNC(DBMS_RANDOM.VALUE(0,lista_tip.count))+1);
+    v_avg := TO_DATE('00:00','hh24:mi')+trunc(DBMS_RANDOM.VALUE(1,3))/24;
+
+    insert into servicii values(v_i,v_nume,v_prenume,v_avg,sysdate,sysdate);
    END LOOP;
+   --sfarsit populare servicii
 
-FOR v_i IN 1...200 LOOP
-v_nume := lista_nume_furnizori(TRUNC(DBMS_RANDOM.VALUE(0,lista_nume_furnizori.count))+1);
-v_prenume := lista_tip_servi(TRUNC(DBMS_RANDOM.VALUE(0,lista_tip_servi.count))+1);
-v_trust := TRUNC(DBMS_RANDOM.VALUE(0,10));
-v_des := TO_DATE('00:00','hh:mi')+TRUNC(DBMS_RANDOM.VALUE(0,365));
-v_inc := TO_DATE('00:00','hh:mi')+TRUNC(DBMS_RANDOM.VALUE(0,365));
-insert into furnizori values(v_i,v_nume,v_des,v_inc,v_prenume,v_trust,sysdate,sysdate);
-
-END LOOP;
-
-FOR v_i IN 1...200 LOOP
-v_nume := lista_servicii(TRUNC(DBMS_RANDOM.VALUE(0,lista_servicii.count))+1);
-v_prenume := lista_tip(TRUNC(DBMS_RANDOM.VALUE(0,lista_tip.count))+1);
-v_avg := TO_DATE('00:00','hh:mi')+TRUNC(DBMS_RANDOM.VALUE(0,365));
-
-insert into servicii values(v_i,v_nume,v_prenume,v_avg,sysdate,sysdate);
-
-END LOOP;
-
-
-
-for v_i in 1...200 loop
+  --inceput populare programari
+  v_index:=1;
+  for v_i in 1..200 loop
 
 LOOP
     v_client := TRUNC(DBMS_RANDOM.VALUE(1,1000));
@@ -176,23 +186,42 @@ LOOP
          exit when v_temp=0;
       END LOOP;
 v_date := TO_DATE('01-01-2000','MM-DD-YYYY')+TRUNC(DBMS_RANDOM.VALUE(0,365));
-v_hour := TO_DATE('00:00','hh:mi')+TRUNC(DBMS_RANDOM.VALUE(0,365));
-insert into programari values(v_i,v_client,v_furniz,v_serv,v_date,v_hour,sysdate,sysdate);
+select Avg_time into v_avg from servicii where id=v_serv;
+select ORA_DESC,ORA_INC into v_des,v_inc from furnizori where id = v_furniz;
+v_hour := v_des;
+ loop
+ v_hour:=to_date(to_char(to_number(to_char(v_hour,'hh24'))+to_number(to_char(v_avg,'hh24'))) || ':' || to_char(v_hour,'MI'),'HH24:MI');
+DBMS_OUTPUT.PUT_LINE('v_hout' || to_char(v_hour,'HH24:MI')); 
+ if(to_number(to_char(v_hour,'HH24'))>to_number(to_char(v_des,'HH24')) and (to_number(to_char(v_hour,'HH24'))<to_number(to_char(v_inc,'HH24')))) then
+  if(sysdate > v_date ) then
+    insert into programari values(v_index,v_client,v_furniz,v_serv,v_date,v_hour,null,sysdate,sysdate);
+  else
+    if(trunc(dbms_random.value(1,4))<3)then
+      insert into programari values(v_index,v_client,v_furniz,v_serv,v_date,v_hour,'TRUE',sysdate,sysdate);
+    ELSE
+      insert into programari values(v_index,v_client,v_furniz,v_serv,v_date,v_hour,'FALSE',sysdate,sysdate);
+    end if;
+  end if;
+ ELSE
+  EXIT;
+ END IF;
+ v_index:=v_index+1;
+ end loop;
 end loop;
-
-
-  FOR v_i IN 1..200 LOOP
+   --sfarsit popilare programari;
+   
+   --inceput populare recenzii;
+ FOR v_i IN 1..200 LOOP
     LOOP
     v_client := TRUNC(DBMS_RANDOM.VALUE(1,1000));
          v_furniz := TRUNC(DBMS_RANDOM.VALUE(1,200));
-         v_serv := TRUNC(DBMS_RANDOM.VALUE(1,100));
-          v_rating := TRUNC(DBMS_RANDOM.VALUE(0,10));
-         select count(*) into v_temp from recenzi where id_furnizor=v_furniz and id_serviciu=v_serv and rating=v_rating and id_client=v_client;
+        v_serv := TRUNC(DBMS_RANDOM.VALUE(1,100));
+         v_rating := TRUNC(DBMS_RANDOM.VALUE(0,10));
+         select count(*) into v_temp from recenzii where id_furnizor=v_furniz and id_serviciu=v_serv and rating=v_rating and id_client=v_client;
          exit when v_temp=0;
       END LOOP;
    
    
-    insert into recenzi values(v_i ,v_client , v_furniz ,v_serv ,v_rating , sysdate, sysdate);
-   END LOOP;
-
+    insert into recenzii values(v_i ,v_client , v_furniz ,v_serv ,v_rating , sysdate, sysdate);
+  END LOOP;
 END;
