@@ -1,16 +1,15 @@
-DROP TABLE clienti CASCADE CONSTRAINTS
-/
-DROP TABLE servicii CASCADE CONSTRAINTS
-/
+DROP TABLE clienti CASCADE CONSTRAINTS;
 
-DROP TABLE furnizori CASCADE CONSTRAINTS
-/
+DROP TABLE servicii CASCADE CONSTRAINTS;
 
-DROP TABLE programari CASCADE CONSTRAINTS
-/
+DROP TABLE furnizori CASCADE CONSTRAINTS;
 
-DROP TABLE recenzii CASCADE CONSTRAINTS
-/
+
+DROP TABLE programari CASCADE CONSTRAINTS;
+
+
+DROP TABLE recenzii CASCADE CONSTRAINTS;
+
 
 
 CREATE TABLE clienti (
@@ -191,7 +190,7 @@ select ORA_DESC,ORA_INC into v_des,v_inc from furnizori where id = v_furniz;
 v_hour := v_des;
  loop
  v_hour:=to_date(to_char(to_number(to_char(v_hour,'hh24'))+to_number(to_char(v_avg,'hh24'))) || ':' || to_char(v_hour,'MI'),'HH24:MI');
-DBMS_OUTPUT.PUT_LINE('v_hout' || to_char(v_hour,'HH24:MI')); 
+--DBMS_OUTPUT.PUT_LINE('v_hout' || to_char(v_hour,'HH24:MI')); 
  if(to_number(to_char(v_hour,'HH24'))>to_number(to_char(v_des,'HH24')) and (to_number(to_char(v_hour,'HH24'))<to_number(to_char(v_inc,'HH24')))) then
   if(sysdate > v_date ) then
     insert into programari values(v_index,v_client,v_furniz,v_serv,v_date,v_hour,null,sysdate,sysdate);
