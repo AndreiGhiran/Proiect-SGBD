@@ -1,5 +1,5 @@
 1.(DONE)Functie de calculare a review-urilor pe fiecare magazin si facut update in tabele
-2.(DONE)Functie de calculat procentajul clientilor ce au dat review si zilele in care au fost date cele mai bune review-uri
+2.(DONE)Functie de calculat procentajul clientilor ce au dat review
 3.(DONE)Functie de cautat cel mai bun magazin/cabinet in functie de serviciul selectat
 4.(DONE)Functie de cautat cel mai bun magazin/cabinet in functie de serviciul selectat si o perioada de timp selectata de client
 5.(DONE)Functie de inserat toate serviciile unui magazin/cabinet in tabel
