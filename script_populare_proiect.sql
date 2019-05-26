@@ -16,7 +16,7 @@ CREATE TABLE clienti (
   id INT NOT NULL PRIMARY KEY,
   nume VARCHAR2(15) NOT NULL,
   prenume VARCHAR2(30) NOT NULL,
-  telefon VARCHAR(10),
+  telefon VARCHAR2(10),
   trust NUMBER,
   created_at DATE,
   updated_at DATE
@@ -69,6 +69,7 @@ CREATE TABLE recenzii (
   id_furnizor INT NOT NULL,
   id_serviciu INT NOT NULL,
   rating NUMBER(3),
+  rating_text VARCHAR2(300),
   created_at DATE,
   updated_at DATE,
   CONSTRAINT fk_recenzii_id_client FOREIGN KEY (id_client) REFERENCES clienti(id),
@@ -141,7 +142,7 @@ BEGIN
       
       
      LOOP
-         v_matr := '0' || CHR(FLOOR(DBMS_RANDOM.VALUE(0,9))) ||CHR(FLOOR(DBMS_RANDOM.VALUE(0,9))) || FLOOR(DBMS_RANDOM.VALUE(0,9)) || FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9));
+         v_matr := '0' || '7' || FLOOR(DBMS_RANDOM.VALUE(0,9)) || FLOOR(DBMS_RANDOM.VALUE(0,9)) || FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9));
           v_trust := TRUNC(DBMS_RANDOM.VALUE(0,10));
          select count(*) into v_temp from clienti where telefon = v_matr and trust=v_trust;
          exit when v_temp=0;
@@ -184,7 +185,7 @@ LOOP
          select count(*) into v_temp from programari where id_furnizor=v_furniz and id_serviciu=v_serv and id_client=v_client;
          exit when v_temp=0;
       END LOOP;
-v_date := TO_DATE('01-01-2000','MM-DD-YYYY')+TRUNC(DBMS_RANDOM.VALUE(0,365));
+v_date := sysdate+TRUNC(DBMS_RANDOM.VALUE(-60,60));
 select Avg_time into v_avg from servicii where id=v_serv;
 select ORA_DESC,ORA_INC into v_des,v_inc from furnizori where id = v_furniz;
 v_hour := v_des;
@@ -192,7 +193,7 @@ v_hour := v_des;
  v_hour:=to_date(to_char(to_number(to_char(v_hour,'hh24'))+to_number(to_char(v_avg,'hh24'))) || ':' || to_char(v_hour,'MI'),'HH24:MI');
 --DBMS_OUTPUT.PUT_LINE('v_hout' || to_char(v_hour,'HH24:MI')); 
  if(to_number(to_char(v_hour,'HH24'))>to_number(to_char(v_des,'HH24')) and (to_number(to_char(v_hour,'HH24'))<to_number(to_char(v_inc,'HH24')))) then
-  if(sysdate > v_date ) then
+  if(sysdate < v_date ) then
     insert into programari values(v_index,v_client,v_furniz,v_serv,v_date,v_hour,null,sysdate,sysdate);
   else
     if(trunc(dbms_random.value(1,4))<3)then
@@ -210,17 +211,139 @@ end loop;
    --sfarsit popilare programari;
    
    --inceput populare recenzii;
- FOR v_i IN 1..200 LOOP
+ FOR v_i IN 1..1000 LOOP
+    
     LOOP
     v_client := TRUNC(DBMS_RANDOM.VALUE(1,1000));
          v_furniz := TRUNC(DBMS_RANDOM.VALUE(1,200));
         v_serv := TRUNC(DBMS_RANDOM.VALUE(1,100));
-         v_rating := TRUNC(DBMS_RANDOM.VALUE(0,10));
+         v_rating := TRUNC(DBMS_RANDOM.VALUE(-1,11));
          select count(*) into v_temp from recenzii where id_furnizor=v_furniz and id_serviciu=v_serv and rating=v_rating and id_client=v_client;
          exit when v_temp=0;
       END LOOP;
    
    
-    insert into recenzii values(v_i ,v_client , v_furniz ,v_serv ,v_rating , sysdate, sysdate);
+    insert into recenzii values(v_i ,v_client , v_furniz ,v_serv ,v_rating, NULL , sysdate, sysdate);
   END LOOP;
+  
+  
 END;
+
+CREATE OR REPLACE PROCEDURE calculeaza_trust_factor_single (id_val IN number) AS
+cursor lista_programari is select atendance from programari where id_client=id_val;
+v_trust NUMBER(3);
+v_atendance VARCHAR2(10);
+begin
+select trust into v_trust from clienti where id=id_val;
+OPEN lista_programari;
+LOOP
+    FETCH lista_programari into v_atendance;
+    EXIT WHEN lista_programari%NOTFOUND;
+    if(v_atendance = 'FALCE') THEN
+      v_trust:=v_trust-1;
+    else
+      if(v_atendance = 'TRUE') then 
+        v_trust := v_trust+1;
+      end if;
+    end if;
+END LOOP;
+if(v_trust<0)then
+  v_trust := 0;
+else
+  if (v_trust > 10) then
+    v_trust := 10;
+  end if;
+end if;
+close lista_programari;
+update clienti 
+set trust = v_trust where id = id_val;
+end;
+
+CREATE OR REPLACE PROCEDURE calculeaza_trust_factor_all AS
+CURSOR lista_clienti is select ID, TRUST from CLIENTI;
+CURSOR lista_atendance (p_id NUMBER) is SELECT atendance FROM programari where id_client=p_id;
+v_id NUMBER;
+v_trust NUMBER(3);
+v_atendance VARCHAR2(10);
+begin
+OPEN lista_clienti;
+LOOP
+    FETCH lista_clienti into v_id,v_trust;
+    EXIT WHEN lista_clienti%NOTFOUND;
+    open lista_atendance (v_id);
+    LOOP
+      fetch lista_atendance into v_atendance;
+      exit when lista_atendance%NOTFOUND;
+    if(v_atendance = 'FALCE') THEN
+      v_trust:=v_trust-1;
+    else
+      if(v_atendance = 'TRUE') then 
+        v_trust := v_trust+1;
+      end if;
+    end if;
+    END LOOP;
+close lista_atendance;
+if(v_trust<0)then
+  v_trust := 0;
+else
+  if (v_trust > 10) then
+    v_trust := 10;
+  end if;
+end if;
+update clienti set trust = v_trust where id = v_id;
+END LOOP;
+close lista_clienti;
+end;
+
+CREATE OR REPLACE PROCEDURE statistici_rating_pe_note (p_id IN NUMBER) as
+v_stat NUMBER;
+BEGIN
+ for v_i in 0..10 loop
+  select count(rating) into v_stat from recenzii where id_serviciu=p_id and rating=v_i;
+  if(v_stat != 0) then
+    DBMS_OUTPUT.PUT_LINE('rating-uri de '|| v_i || ': ' || v_stat);
+  end if;
+ end loop;
+END;
+
+CREATE OR REPLACE PROCEDURE statistici_rating_mediu (p_id IN NUMBER) as
+v_stat NUMBER;
+BEGIN
+ 
+  select avg(rating) into v_stat from recenzii where id_serviciu=p_id;
+    DBMS_OUTPUT.PUT_LINE('Rating mediu: '|| v_stat);
+
+END;
+
+create or replace procedure procent_clienti_veniti_la_timp (p_id NUMBER) as
+v_atendance_t NUMBER;
+V_atendance_f NUmber;
+begin
+ select count(atendance) into v_atendance_t from programari where id_furnizor = p_id and atendance='TRUE';
+ select count(atendance) into v_atendance_f from programari where id_furnizor = p_id and atendance='FALSE';
+ if (v_atendance_t + v_atendance_f != 0 ) then
+ DBMS_OUTPUT.PUT_LINE( round((v_atendance_t * 100) / (v_atendance_t + v_atendance_f)) || '% din clienti au avenit la programari');
+ end if;
+end;
+
+DECLARE
+cursor lista is select unique(id_furnizor) from PROGRAMARI;
+v_variabila number;
+BEGIN
+STATISTICI_RATING_PE_NOTE(11);
+DBMS_OUTPUT.PUT_LINE('');
+STATISTICI_RATING_MEDIU(11);
+open lista;
+loop
+fetch lista into v_variabila;
+exit when lista%NOTFOUND;
+procent_clienti_veniti_la_timp(v_variabila);
+end loop;
+END;
+
+
+--select unique(id_furnizor ) from PROGRAMARI;
+--select id,ID_CLIENT,ID_FURNIZOR,ID_SERVICIU,to_char(DATA_PROGRAMARE,'dd-mm-yyyy'),to_char(ORA_PROGRAMARE,'hh24:mi'),ATENDANCE from programari order by ID_FURNIZOR;
+--select rating from recenzii where id_serviciu=11;
+--select count(id_serviciu) from recenzii where id_client= 670 group by id_client;
+--select max(count(*)) from recenzii group by id_client having count(*) !=2;

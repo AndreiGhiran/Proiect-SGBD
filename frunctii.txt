@@ -5,8 +5,8 @@
 5.Functie de inserat toate serviciile unui magazin/cabinet in tabel
 6.Functie de calculat orele de varf a fiecarui magazin
 7.Functie de ascundere a cuvintelor urate in review-uri
-8.Functie de calculare a trust factor-ului
-9.Functie de calculat statistica pe fiecare scor primit(o stea ,doua ,trei...)
-10.Functie de calculat procentajul clientilor ce au venit la timp
+8.(DONE)Functie de calculare a trust factor-ului
+9.(DONE)Functie de calculat statistica pe fiecare scor primit(o stea ,doua ,trei...)
+10.(DONE)Functie de calculat procentajul clientilor ce au venit la timp
 11.Functie de calculat a timpului mediu per consult la fiecare magazin/cabinet
 12.Functie de calculat de cati angajati mai este nevoie pentru a satisface toti clientii
