@@ -326,22 +326,59 @@ begin
  end if;
 end;
 
-DECLARE
-cursor lista is select unique(id_furnizor) from PROGRAMARI;
-v_variabila number;
+CREATE OR REPLACE PROCEDURE cenzurare_all as
+v_text varchar(300);
+v_cuvant varchar(10);
+v_size NUMBER;
+TYPE varr IS VARRAY(1000) OF varchar2(255);
+lista_cuvinte_urate varr := varr('pula', 'pizda', 'cacat', 'pisat', 'bulagiu', 'poponar', 'cur', 'curva', 'bou', 'poponar');
 BEGIN
-STATISTICI_RATING_PE_NOTE(11);
-DBMS_OUTPUT.PUT_LINE('');
-STATISTICI_RATING_MEDIU(11);
-open lista;
-loop
-fetch lista into v_variabila;
-exit when lista%NOTFOUND;
-procent_clienti_veniti_la_timp(v_variabila);
+select count(*) into v_size from recenzii;
+for v_i in 1..v_size LOOP
+  select rating_text into v_text from recenzii where id = v_i;
+  for v_i2 in 1..lista_cuvinte_urate.count loop
+    v_cuvant := lista_cuvinte_urate(v_i2);
+    v_text:=REPLACE(v_text,v_cuvant,'*****');
+  end loop;
+  update recenzii set rating_text = v_text where id=v_i;
 end loop;
 END;
 
+CREATE OR REPLACE PROCEDURE cenzurare_imput (p_text IN OUT VARCHAR2) as
+v_cuvant varchar(10);
+TYPE varr IS VARRAY(1000) OF varchar2(255);
+lista_cuvinte_urate varr := varr('pula', 'pizda', 'cacat', 'pisat', 'bulagiu', 'poponar', 'cur', 'curva', 'bou', 'poponar');
+BEGIN
+  for v_i in 1..lista_cuvinte_urate.count loop
+    v_cuvant := lista_cuvinte_urate(v_i);
+    p_text:=REPLACE(p_text,v_cuvant,'*****');
+  end loop;
+END;
 
+
+--DECLARE
+--cursor lista is select unique(id_furnizor) from PROGRAMARI;
+--v_variabila number;
+--BEGIN
+--STATISTICI_RATING_PE_NOTE(11);
+--DBMS_OUTPUT.PUT_LINE('');
+--STATISTICI_RATING_MEDIU(11);
+--open lista;
+--loop
+--fetch lista into v_variabila;
+--exit when lista%NOTFOUND;
+--procent_clienti_veniti_la_timp(v_variabila);
+--end loop;
+--END;
+
+--declare
+--v_text varchar2(300);
+--begin
+--v_text:='Bag pizda in SGBD';
+--CENZURARE_IMPUT(v_text);
+--DBMS_OUTPUT.PUT_LINE(v_text);
+--end;
+--drop procedure cenzurarea_imput;
 --select unique(id_furnizor ) from PROGRAMARI;
 --select id,ID_CLIENT,ID_FURNIZOR,ID_SERVICIU,to_char(DATA_PROGRAMARE,'dd-mm-yyyy'),to_char(ORA_PROGRAMARE,'hh24:mi'),ATENDANCE from programari order by ID_FURNIZOR;
 --select rating from recenzii where id_serviciu=11;
