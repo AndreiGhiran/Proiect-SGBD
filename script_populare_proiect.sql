@@ -436,6 +436,43 @@ if (v_count = 0) then
 end if;
 END;
 
+create or replace procedure add_serviciu (p_nume IN VARCHAR2, p_tip IN VARCHAR2, p_avg_time VARCHAR2) AS
+v_id NUMBER;
+BEGIN
+SELECT MAX(id) into v_id from servicii;
+insert into servicii values ( v_id+1, p_nume,p_tip, to_date(p_avg_time,'HH24:MI'),sysdate,sysdate); 
+END;
+
+create or replace procedure add_programare(p_id_cl IN NUMBER, p_id_fur IN NUMBER, p_id_ser IN NUMBER, p_data IN VARCHAR2, p_ora VARCHAR2) AS
+v_in NUMBER;
+BEGIN
+select max(id) into v_in from programari;
+insert into programari values(v_in+1,p_id_cl,p_id_fur,p_id_ser,to_date(p_data,'DD-MM-YYYY'),TO_DATE(p_ora,'HH24:MI'),null,sysdate,sysdate);
+END;
+
+create or replace procedure delete_client(p_id IN NUMBER) AS
+BEGIN
+delete from clienti where id=p_id;
+END;
+
+create or replace procedure delete_furnizor(p_id IN NUMBER) AS
+BEGIN
+delete from furnizori where id=p_id;
+END;
+
+
+create or replace procedure delete_serviciu(p_id IN NUMBER) AS
+BEGIN
+delete from servicii where id=p_id;
+END;
+
+
+create or replace procedure delete_programare(p_id IN NUMBER) AS
+BEGIN
+delete from programari where id=p_id;
+END;
+
+
 create or replace procedure client_atendance (p_id IN NUMBER, p_atendance IN VARCHAR2) AS
 v_id_client NUMBER;
 v_count NUMBER;
