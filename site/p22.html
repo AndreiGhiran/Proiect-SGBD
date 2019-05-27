@@ -41,18 +41,81 @@
 <aside>
 
 <h2>Schimba parola </h2>
- <form action="#.php">
- <input type="oldpassword" name="password" placeholder=" Old password"><br><br>
-  <input type="newpassword" name="password" placeholder=" New password"><br><br>
+ <form action="#f4.php">
+ <input type="password" name="oldpassword" placeholder="Vechea parola"><br><br>
+  <input type="password" name="newpassword" placeholder="Noua parola"><br><br>
   <input type="submit" value="Submit">
+</form> 
+<br><br>
+ <form action="#f12.php">
+  <input type="submit" value="Log out">
 </form>
-
 
 
 </aside>
 
 <section>
-<h3> Cauta </h3>
+<h2> Cauta magazinul cu review cel mai bun review</h2>
+<form action="#f3.php">
+  <input type="text" name="nui" placeholder="Numele magazinului"><br><br>
+  <input type="text" name="tui" placeholder="Tipul maganului"><br><br>
+  <input type="submit" value="Submit">
+</form> 
+
+<h2>Afiseaza review</h2>
+ <form action="#f15.php">
+  <input type="user" name="idm" placeholder="Id magazin"><br><br>
+    <input type="user" name="ids" placeholder="Id serviciu"><br><br>
+  <input type="submit" value="Submit">
+</form>
+
+<h2>Afiseaza review cenzurat</h2>
+ <form action="#f16.php">
+  <input type="user" name="idm" placeholder="Id magazin"><br><br>
+    <input type="user" name="ids" placeholder="Id serviciu"><br><br>
+  <input type="submit" value="Submit">
+</form>
+
+<h2>Vezi program liber magazin</h2>
+ <form action="#f17.php">
+  <input type="user" name="idm" placeholder="Id magazin"><br><br>
+    <input type="user" name="ids" placeholder="Id serviciu"><br><br>
+  <input type="submit" value="Submit">
+</form>
+
+<h2>Adauga review </h2>
+ <form action="#f18.php">
+  <input type="user" name="idm" placeholder="Id magazin"><br><br>
+    <input type="user" name="ids" placeholder="Id serviciu"><br><br>
+	   <input type="user" name="text" placeholder="Review"><br><br>
+  <input type="submit" value="Submit">
+</form>
+
+<h2>Sterge review </h2>
+ <form action="#f19.php">
+  <input type="user" name="idm" placeholder="Id magazin"><br><br>
+    <input type="user" name="ids" placeholder="Id serviciu"><br><br>
+	   <input type="user" name="idr" placeholder="Id review"><br><br>
+  <input type="submit" value="Submit">
+</form>
+
+<h2>Vezi ce review-uri ai dat </h2>
+ <form action="#f22.php">
+  <input type="submit" value="Submit">
+</form>
+
+
+<h2>Procentaj clienti ce au dat review </h2>
+ <form action="#f20.php">
+  <input type="submit" value="Submit">
+</form>
+
+<h2>Procentaj clienti ce au dat review la un magazin </h2>
+ <form action="#f21php">
+  <input type="user" name="idm" placeholder="Id magazin"><br><br>
+    <input type="user" name="ids" placeholder="Id serviciu"><br><br>
+  <input type="submit" value="Submit">
+</form>
 
 
 
