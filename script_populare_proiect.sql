@@ -16,6 +16,7 @@ CREATE TABLE clienti (
   id INT NOT NULL PRIMARY KEY,
   nume VARCHAR2(15) NOT NULL,
   prenume VARCHAR2(30) NOT NULL,
+  pass VARCHAR2(100) NOT NULL,
   telefon VARCHAR2(10),
   trust NUMBER,
   created_at DATE,
@@ -89,7 +90,8 @@ DECLARE
   lista_servicii varr := varr('A','B','C');
   lista_tip varr := varr('A','B','C','D');
   lista_tip_servi varr := varr('A','B','C','D');
-  
+  lista_litere varr := varr('a','A','b','B','c','B','d','D','e','E','f','F','g','G','h','H','i','I','j','J','k','K','l','L','m','M','n','N','o','O','p','P','r','R','s','S','t','T','u','U','v','V','w','W','x','X','y','Y','z','Z');
+  v_parola VARCHAR2(10);
   v_nume VARCHAR2(255);
   v_prenume VARCHAR2(255);
   v_prenume1 VARCHAR2(255);
@@ -144,11 +146,12 @@ BEGIN
      LOOP
          v_matr := '0' || '7' || FLOOR(DBMS_RANDOM.VALUE(0,9)) || FLOOR(DBMS_RANDOM.VALUE(0,9)) || FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9))|| FLOOR(DBMS_RANDOM.VALUE(0,9));
           v_trust := TRUNC(DBMS_RANDOM.VALUE(0,10));
-         select count(*) into v_temp from clienti where telefon = v_matr and trust=v_trust;
+          v_parola := lista_litere(TRUNC(DBMS_RANDOM.VALUE(0,lista_litere.count))+1)|| FLOOR(DBMS_RANDOM.VALUE(0,9)) || lista_litere(TRUNC(DBMS_RANDOM.VALUE(0,lista_litere.count))+1) || FLOOR(DBMS_RANDOM.VALUE(0,9)) || lista_litere(TRUNC(DBMS_RANDOM.VALUE(0,lista_litere.count))+1)|| FLOOR(DBMS_RANDOM.VALUE(0,9)) || lista_litere(TRUNC(DBMS_RANDOM.VALUE(0,lista_litere.count))+1) || FLOOR(DBMS_RANDOM.VALUE(0,9)) || lista_litere(TRUNC(DBMS_RANDOM.VALUE(0,lista_litere.count))+1);
+         select count(*) into v_temp from clienti where telefon = v_matr and trust=v_trust and pass=v_parola;
          exit when v_temp=0;
       END LOOP;
 
-  insert into clienti values(v_i, v_nume, v_prenume,v_matr ,v_trust , sysdate, sysdate);
+  insert into clienti values(v_i, v_nume, v_prenume, v_parola ,v_matr ,v_trust , sysdate, sysdate);
    END LOOP; 
    -- sfarsit populare clienti
    
@@ -159,7 +162,7 @@ BEGIN
      v_trust := TRUNC(DBMS_RANDOM.VALUE(0,10));
      v_des := TO_DATE('00:00','HH24:MI')+TRUNC(DBMS_RANDOM.VALUE(7,14))/24; 
      v_inc := v_des+(8/24)+1/24;
-     
+
      insert into furnizori values(v_i,v_nume,v_des,v_inc,v_prenume,v_trust,sysdate,sysdate);
    end loop;
    --sfarsit populare furnizori
@@ -355,32 +358,122 @@ BEGIN
   end loop;
 END;
 
+CREATE OR REPLACE PROCEDURE add_client (p_nume IN VARCHAR2, p_prenume IN VARCHAR2 ,p_pass IN VARCHAR2, p_tel varchar2) as 
+v_id number;
+v_count_name number;
+v_count_pass number;
+begin
+select count(*) into v_count_name from clienti where nume=p_nume and prenume=p_prenume;
+if (v_count_name > 0) then 
+  DBMS_OUTPUT.PUT_LINE('clientul este deja inregistrat');
+  return;
+else
+  select count(*) into v_count_pass from clienti where pass=p_pass;
+  if (v_count_pass = 0) then
+    select max(id) into v_id from clienti;
+    insert into clienti values (v_id+1, p_nume, p_prenume, p_pass, p_tel ,5 , sysdate, sysdate);
+  else
+    DBMS_OUTPUT.PUT_LINE('parola deja folosita');
+  end if;
+end if;
+end;
 
---DECLARE
---cursor lista is select unique(id_furnizor) from PROGRAMARI;
---v_variabila number;
---BEGIN
---STATISTICI_RATING_PE_NOTE(11);
---DBMS_OUTPUT.PUT_LINE('');
---STATISTICI_RATING_MEDIU(11);
---open lista;
---loop
---fetch lista into v_variabila;
---exit when lista%NOTFOUND;
---procent_clienti_veniti_la_timp(v_variabila);
---end loop;
---END;
+create or replace procedure schimbare_parola (p_id IN NUMBER, p_old_pass IN VARCHAR2, p_new_pass IN VARCHAR2) as
+v_count_id number;
+v_pass varchar2(100);
+begin
+select count(id) into v_count_id from clienti where id=p_id;
+if (v_count_id = 0) then
+  DBMS_OUTPUT.PUT_LINE('CLIENTUL NU EXISTA');
+  RETURN;
+ELSE
+  select pass into v_pass from CLIENTI where id=p_id;
+  if (v_pass = p_old_pass) then
+   update clienti set pass = p_new_pass where id = p_id;
+  else
+   DBMS_OUTPUT.PUT_LINE('PAROLA INCORECTA');
+  END IF;
+end if;
+end;
 
---declare
---v_text varchar2(300);
---begin
---v_text:='Bag pizda in SGBD';
---CENZURARE_IMPUT(v_text);
---DBMS_OUTPUT.PUT_LINE(v_text);
---end;
---drop procedure cenzurarea_imput;
---select unique(id_furnizor ) from PROGRAMARI;
---select id,ID_CLIENT,ID_FURNIZOR,ID_SERVICIU,to_char(DATA_PROGRAMARE,'dd-mm-yyyy'),to_char(ORA_PROGRAMARE,'hh24:mi'),ATENDANCE from programari order by ID_FURNIZOR;
---select rating from recenzii where id_serviciu=11;
---select count(id_serviciu) from recenzii where id_client= 670 group by id_client;
---select max(count(*)) from recenzii group by id_client having count(*) !=2;
+create or replace procedure schimbare_tel (p_id IN NUMBER, p_old_pass IN VARCHAR2, p_new_tel IN VARCHAR2) as
+v_count_id number;
+v_pass varchar2(100);
+begin
+select count(id) into v_count_id from clienti where id=p_id;
+if (v_count_id = 0) then
+  DBMS_OUTPUT.PUT_LINE('CLIENTUL NU EXISTA');
+  RETURN;
+ELSE
+  select pass into v_pass from CLIENTI where id=p_id;
+  if (v_pass = p_old_pass) then
+   update clienti set telefon = p_new_tel where id = p_id;
+  else
+   DBMS_OUTPUT.PUT_LINE('PAROLA INCORECTA');
+  END IF;
+end if;
+end;
+
+create or replace procedure add_furnizor (p_nume IN VARCHAR2, p_ora_desc IN VARCHAR2, p_ora_inc IN VARCHAR2, p_tip_serv IN VARCHAR2, p_trust_lvl NUMBER) as
+v_id number;
+v_count NUMBER;
+BEGIN
+select count(*) into v_count from furnizori where nume=p_nume;
+if (v_count = 0) then
+  select max(id) into v_id from furnizori;
+  insert into furnizori values (v_id+1,p_nume,to_date(p_ora_desc,'HH24:MI'),TO_DATE(p_ora_inc,'HH24:MI'),p_tip_serv,p_trust_lvl,sysdate,sysdate);
+else
+  dbms_output.put_line('furnizorul deja exista');
+end if;
+END;
+
+create or replace procedure schimbare_ore (p_id IN NUMBER, p_ora_desc IN VARCHAR2, p_ora_inc IN VARCHAR2) as
+v_count NUMBER;
+BEGIN
+select count(id) into v_count from furnizori where id=p_id;
+if (v_count = 0) then
+  update furnizori set ora_desc = to_date(p_ora_desc,'HH24:MI'), ora_inc = TO_DATE(p_ora_inc,'HH24:MI') where id = p_id;
+end if;
+END;
+
+create or replace procedure client_atendance (p_id IN NUMBER, p_atendance IN VARCHAR2) AS
+v_id_client NUMBER;
+v_count NUMBER;
+BEGIN
+select count(*) into v_count from programari where id = p_id;
+if(v_count = 1) then
+  select id_client into v_id_client from programari where id = p_id;
+  update programari set atendance = p_atendance where id=p_id;
+  CALCULEAZA_TRUST_FACTOR_SINGLE(v_id_client);
+else
+ DBMS_OUTPUT.PUT_LINE('Programare inexistenta');
+end if;
+END;
+
+create or replace procedure atendance_update as
+cursor lista_programari_trecute is select id,id_client from programari where atendance = null and sysdate > data_programare; 
+v_id NUMBER;
+v_id_client NUMBER;
+BEGIN
+open lista_programari_trecute;
+loop
+  fetch lista_programari_trecute into v_id,v_id_client;
+  exit when lista_programari_trecute%NOTFOUND;
+  update programari set atendance = 'FALSE' where id = v_id;
+  CALCULEAZA_TRUST_FACTOR_SINGLE(v_id_client);
+end loop;
+END;
+
+BEGIN
+DBMS_SCHEDULER.CREATE_JOB (
+   job_name           =>  'atendance_auto_update',
+   job_type           =>  'STORED_PROCEDURE',
+   job_action         =>  'ATENDANCE_UPDATE',
+   start_date         =>  sysdate,
+   repeat_interval    =>  'FREQ=DAILY;INTERVAL=1', /* every other day */
+   end_date           =>   SYSDATE + 365);
+END;
+
+begin
+DBMS_SCHEDULER.ENABLE('atendance_auto_update');
+end;
