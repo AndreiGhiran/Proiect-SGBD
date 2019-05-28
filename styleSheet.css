@@ -1,0 +1,267 @@
+
+body
+{
+	background-color: #d9d9d9;
+	
+}
+
+section > img.logo
+{
+	height:20vh;
+	width:auto;
+}
+
+div.account > input
+{
+	display:block;
+}
+
+nav
+{
+	border-radius: 25px;
+	position:absolute;
+	display:flex;
+	background-color: #33A1FF;
+	position:absolute;
+	width:99%;	
+	padding:0;
+	box-shadow: 0px 3px 0px 3px rgba(0,0.15,0.15,0.15);
+	border-radius: 25px;
+}
+
+nav > ul
+{
+	top:0;
+	right:0;
+	list-style-type:none;
+	width:100vw;
+	white-space:nowrap;
+	display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: space-around;
+	padding:0;
+	margin:0;
+	border:0;
+	
+}
+
+nav > ul > li
+{
+	width:20%;
+	padding:0;
+	margin:0;
+	border:0;
+}
+
+nav > ul > li > a
+{
+	border-radius: 25px;
+	display:block;
+	padding:5vh;
+	text-align:center;
+	background-color:#33A1FF;
+	color:white;
+	text-decoration:none;
+	font-family:Courier new;
+	border:0;
+}
+
+
+nav > ul > li > a:hover
+{
+	background-color:#990000;
+	font-family:Courier new;
+	margin:0;
+}
+
+nav > ul > li > a:visited
+{
+	color:white;
+	text-decoration:none;
+	font-family:Courier new;
+	margin:0;
+}
+
+
+aside
+{
+	border-radius: 5px;
+	font-family:Courier new;
+	overflow:auto;	
+	grid-row-start: 2;
+	grid-column: 1 / 2;
+	background-color:#ffffff;
+	width:101%;	
+	text-align:center;
+	box-shadow: 0px 3px 3px 3px rgba(0,0.15,0.15,0.15);
+}
+
+section
+{
+	border-radius: 5px;
+	font-family:Courier new;		
+	grid-row-start: 2;
+	grid-column: 2 / 3;
+	background-color:#ffffff;
+	text-align:center;
+	position:relative;
+	overflow:auto;
+	box-shadow: 0px 3px 3px 3px rgba(0,0.15,0.15,0.15);
+}
+
+sectionn
+{
+	
+	border-radius: 5px;
+	font-family:Courier new;		
+	grid-row-start: 2;
+	grid-column: 1 / 3;
+	background-color:#ffffff;
+	text-align:center;
+	position:relative;
+	overflow:auto;
+	box-shadow: 0px 3px 3px 3px rgba(0,0.15,0.15,0.15);
+}
+
+main
+{
+	height:auto;
+	display : grid;
+	grid-template-columns: 24vw 74vw;
+	grid-template-rows : 13vh minmax(100px, 81vh);
+	grid-gap:1vw;
+}
+
+nav > div.toggle
+{
+	display:none; 
+}
+
+
+section > div.Legenda 
+{
+	height:auto;
+	width:10vw;
+	position:absolute;
+	padding:0;
+	margin:0;
+	left:0;
+	top:0;
+	background-color: rgba(255, 26, 26,0.4);
+}
+
+
+div.Legenda > label
+{
+	display:block;
+	font-size:1.5vw;
+	background: url(up.png) no-repeat center;
+	background-size:2vw;
+}
+
+
+div.Legenda > input
+{
+	display:none;
+}
+
+aside > input
+{
+	display:none;
+}
+
+div.Legenda > ul
+{
+	list-style-type:none;
+	padding:0;
+	margin:0;
+	border:0;
+}
+
+div.Legenda > ul > li
+{
+	height:1.5vw;
+	padding:0;
+	margin:0;
+	border:0;
+}
+
+
+div.Legenda > input:checked ~ ul > li
+{
+	height:0;
+	display:none;
+}
+
+div.Legenda > input:checked ~ label 
+{
+	display:block;
+	background: url(down.png) no-repeat center;
+	background-size:2vw;
+}
+
+
+section img
+{
+	height:90vh;
+	width:auto;
+	top:0;
+	left:0;
+}
+
+aside > label + p
+{
+	display: none;
+	height:0vw;
+	padding:0;
+	margin:0;
+	border:0;
+}
+
+aside > input:checked ~ label + p 
+{
+	display:block;
+}
+
+aside > input
+{
+	display:none;
+}
+
+aside > label
+{
+	font-weight:900;
+	display:block;
+}
+
+section ul 
+{
+	display:grid;
+	grid-template-columns:1vw 2vw;
+	grid-auto-rows : 4vw;
+	grid-column-gap: 3vw;
+}
+
+section  ul > li 
+{
+	margin-left:1vh;
+}
+
+nav > input
+{
+	display:none;
+}
+
+
+section  div.Legenda > ul  img 
+{
+	height:auto;
+	width:1vw;
+}
+
+aside > div.Legenda
+{
+	display: block;
+	overflow:auto;
+}
