@@ -18,6 +18,7 @@ CREATE TABLE clienti (
   prenume VARCHAR2(30) NOT NULL,
   pass VARCHAR2(100) NOT NULL,
   telefon VARCHAR2(10),
+  email varchar2(20),
   trust NUMBER,
   created_at DATE,
   updated_at DATE
@@ -112,6 +113,7 @@ DECLARE
   v_index int;
   v_rating NUMBER(3);
   v_temp_date date;
+  v_email varchar2(40);
 BEGIN
 
   --populare clienti
@@ -149,7 +151,19 @@ BEGIN
          exit when v_temp=0;
       END LOOP;
 
-  insert into clienti values(v_i, v_nume, v_prenume, v_parola ,v_matr ,v_trust , sysdate, sysdate);
+      v_temp:='';
+      v_email := lower(v_nume ||'.'|| v_prenume1);
+      LOOP         
+         select count(*) into v_temp from studenti where email = v_email||v_temp;
+         exit when v_temp=0;
+         v_temp :=  TRUNC(DBMS_RANDOM.VALUE(0,100));
+      END LOOP;    
+      
+      if (TRUNC(DBMS_RANDOM.VALUE(0,2))=0) then v_email := v_email ||'@gmail.com';
+         else v_email := v_email ||'@yahoo.ro';
+      end if;
+
+  insert into clienti values(v_i, v_nume, v_prenume, v_parola ,v_matr, v_email ,v_trust , sysdate, sysdate);
    END LOOP; 
    -- sfarsit populare clienti
       
