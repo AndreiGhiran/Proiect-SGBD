@@ -594,6 +594,17 @@ select (select count(unique( id_client)) from RECENZII where id_furnizor=id_furn
 return v_procent;
 end;
 /
+create or replace function login(p_name varchar2,p_pass varchar2) return int as
+v_id int;
+begin
+select id into v_id from clienti where nume=p_name AND pass=p_pass;
+if (v_id>0) then 
+  return v_id;
+else 
+  return -1;
+end if;
+end;
+/
 begin
 CALCULEAZA_TRUST_FACTOR_ALL;
 end;
