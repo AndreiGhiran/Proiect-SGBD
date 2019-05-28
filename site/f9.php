@@ -1,7 +1,15 @@
 <?php
  require_once "config.php";
-$telefon=$_POST['nume'];
-$password=$_POST['password'];
-
+ require_once "config.php";
+  if(empty(trim($_POST["nume"])) || empty(trim($_POST["password"])) || trim($_POST["password"])==$_SESSION['password'] ) 
+{}
+else
+{
+$nume=$_POST['nume'];
+ $stid = oci_parse($conn, 'begin schimbtelefon(:nume); end;');
+                oci_execute($stid);
+}
+oci_close($conn);
+exit;
 
 ?>
