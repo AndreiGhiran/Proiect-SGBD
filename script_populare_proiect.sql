@@ -17,8 +17,8 @@ CREATE TABLE clienti (
   nume VARCHAR2(15) NOT NULL,
   prenume VARCHAR2(30) NOT NULL,
   pass VARCHAR2(100) NOT NULL,
-  telefon VARCHAR2(10),
-  email varchar2(20),
+  telefon VARCHAR2(100),
+  email varchar2(200),
   trust NUMBER,
   created_at DATE,
   updated_at DATE
@@ -152,9 +152,9 @@ BEGIN
       END LOOP;
 
       v_temp:='';
-      v_email := lower(v_nume ||'.'|| v_prenume1);
+      v_email := lower(v_nume ||'.'|| v_prenume);
       LOOP         
-         select count(*) into v_temp from studenti where email = v_email||v_temp;
+         select count(*) into v_temp from clienti where email = v_email||v_temp;
          exit when v_temp=0;
          v_temp :=  TRUNC(DBMS_RANDOM.VALUE(0,100));
       END LOOP;    
@@ -372,7 +372,7 @@ BEGIN
   return v_text;
 END;
 /
-CREATE OR REPLACE PROCEDURE add_client (p_nume IN VARCHAR2, p_prenume IN VARCHAR2 ,p_pass IN VARCHAR2, p_tel varchar2) as 
+CREATE OR REPLACE PROCEDURE add_client (p_nume IN VARCHAR2, p_prenume IN VARCHAR2 ,p_pass IN VARCHAR2,p_email varchar, p_tel varchar2) as 
 v_id number;
 v_count_name number;
 v_count_pass number;
@@ -385,7 +385,7 @@ else
   select count(*) into v_count_pass from clienti where pass=p_pass;
   if (v_count_pass = 0) then
     select max(id) into v_id from clienti;
-    insert into clienti values (v_id+1, p_nume, p_prenume, p_pass, p_tel ,5 , sysdate, sysdate);
+    insert into clienti values (v_id+1, p_nume, p_prenume, p_pass, p_email, p_tel ,5 , sysdate, sysdate);
   else
     DBMS_OUTPUT.PUT_LINE('parola deja folosita');
   end if;

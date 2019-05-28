@@ -42,13 +42,13 @@
 
 
 <h2>Autentificare </h2>
- <form action="#f1.php">
+ <form action="index.php" method="post">
   <input type="text" name="username" placeholder="Nume"><br>
   <input type="password" name="password" placeholder="Parola"><br><br>
-  <input type="submit" value="Submit">
+  <button type="submit" name="Submit">
 </form> 
 <p><h2>Inregistrare</h2></p>
- <form action="#f2.php">
+ <form action="f2.php">
   <input type="text" name="username" placeholder="Nume"><br>
   <input type="text" name="email" placeholder="Email"><br>
   <input type="text" name="telefon" placeholder="Teledfon"><br>
@@ -82,3 +82,19 @@ la care sunt cele mai multe solicitari de servicii.
 
 
 </html>
+
+
+<?php
+$conn = oci_connect('PROIECT','PROIECT','localhost/XE') or die;
+		include("Header.php");
+		include("Navbar.php");
+function LogIn ()
+{
+	global $conn;
+	$res = 0;
+	$user = $_POST['username'];
+	$pass = $_POST[]
+	
+}
+
+?>
