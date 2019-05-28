@@ -1,15 +1,15 @@
 DROP TABLE clienti CASCADE CONSTRAINTS;
-
+/
 DROP TABLE servicii CASCADE CONSTRAINTS;
-
+/
 DROP TABLE furnizori CASCADE CONSTRAINTS;
-
+/
 
 DROP TABLE programari CASCADE CONSTRAINTS;
-
+/
 
 DROP TABLE recenzii CASCADE CONSTRAINTS;
-
+/
 
 
 CREATE TABLE clienti (
@@ -24,27 +24,27 @@ CREATE TABLE clienti (
 )
 /
 
-
-CREATE TABLE furnizori (
-  id INT NOT NULL PRIMARY KEY,
-  nume VARCHAR2(52) NOT NULL,
-  ora_desc DATE,
-  ora_inc DATE,
-  trust_lvl NUMBER(3),
-  created_at DATE,
-  updated_at DATE
-)
-/
-
-
 CREATE TABLE servicii (
   id INT NOT NULL PRIMARY KEY,
   tip VARCHAR2(52),
   avg_time DATE,
-  rate int,
   created_at DATE,
   updated_at DATE
   )
+/
+
+
+CREATE TABLE furnizori (
+  id INT NOT NULL PRIMARY KEY,
+  nume VARCHAR2(52) NOT NULL,
+  id_serviciu INT NOT NULL,
+  ora_desc DATE,
+  ora_inc DATE,
+  trust_lvl NUMBER(3),
+  created_at DATE,
+  updated_at DATE,
+   CONSTRAINT fk_furnizori_id_serviciu FOREIGN KEY (id_serviciu) REFERENCES servicii(id)
+)
 /
 
 CREATE TABLE programari (
@@ -88,6 +88,7 @@ DECLARE
   lista_nume_furnizori varr := varr('Sc Alex','Selgros','Ikea','Sc Ioana','Sc Andrei','Deluxe','Acord','Dens','Focus','Magnum','Pheonix','Union');
   lista_tip varr := varr('Magazin alimentar','Dentist','Doctor General','Service masini','GSM','Service calculatoare','Coafor','Frizer','Smigerie','Service telefoane','Service biciclete','Magazin mixt','Suermarket','Mini Market','Doctor pedagocic');
   lista_litere varr := varr('a','A','b','B','c','B','d','D','e','E','f','F','g','G','h','H','i','I','j','J','k','K','l','L','m','M','n','N','o','O','p','P','r','R','s','S','t','T','u','U','v','V','w','W','x','X','y','Y','z','Z');
+  v_s_id int;
   v_parola VARCHAR2(10);
   v_nume VARCHAR2(255);
   v_prenume VARCHAR2(255);
@@ -151,26 +152,28 @@ BEGIN
   insert into clienti values(v_i, v_nume, v_prenume, v_parola ,v_matr ,v_trust , sysdate, sysdate);
    END LOOP; 
    -- sfarsit populare clienti
-   
-   --inceput populare firnizori
-   FOR v_i IN 1..200 LOOP
-     v_nume := lista_nume_furnizori(TRUNC(DBMS_RANDOM.VALUE(0,lista_nume_furnizori.count))+1);
-     v_trust := TRUNC(DBMS_RANDOM.VALUE(0,10));
-     v_des := TO_DATE('00:00','HH24:MI')+TRUNC(DBMS_RANDOM.VALUE(7,14))/24; 
-     v_inc := v_des+(8/24)+1/24;
-
-     insert into furnizori values(v_i,v_nume,v_des,v_inc,v_trust,sysdate,sysdate);
-   end loop;
-   --sfarsit populare furnizori
-   
+      
    --inceput populare servicii
    FOR v_i IN 1..200 LOOP
     v_prenume := lista_tip(TRUNC(DBMS_RANDOM.VALUE(0,lista_tip.count))+1);
     v_avg := TO_DATE('00:00','hh24:mi')+trunc(DBMS_RANDOM.VALUE(1,3))/24;
 
-    insert into servicii values(v_i,v_prenume,v_avg,0,sysdate,sysdate);
+    insert into servicii values(v_i,v_prenume,v_avg,sysdate,sysdate);
    END LOOP;
    --sfarsit populare servicii
+   
+   --inceput populare furnizori
+   FOR v_i IN 1..200 LOOP
+     v_nume := lista_nume_furnizori(TRUNC(DBMS_RANDOM.VALUE(0,lista_nume_furnizori.count))+1);
+     v_trust := TRUNC(DBMS_RANDOM.VALUE(0,10));
+     v_des := TO_DATE('00:00','HH24:MI')+TRUNC(DBMS_RANDOM.VALUE(7,14))/24; 
+     v_inc := v_des+(8/24)+1/24;
+     v_s_id := TRUNC(DBMS_RANDOM.VALUE(1,199));
+
+     insert into furnizori values(v_i,v_nume,v_s_id,v_des,v_inc,v_trust,sysdate,sysdate);
+   end loop;
+   --sfarsit populare furnizori
+
 
   --inceput populare programari
   v_index:=1;
@@ -227,7 +230,6 @@ end loop;
   
 END;
 /
-
 CREATE OR REPLACE PROCEDURE calculeaza_trust_factor_single (id_val IN number) AS
 cursor lista_programari is select atendance from programari where id_client=id_val;
 v_trust NUMBER(3);
@@ -309,7 +311,7 @@ create or replace function statistici_rating_mediu (p_id IN NUMBER) return NUMBE
 v_stat NUMBER;
 BEGIN
  
-  select avg(rating) into v_stat from recenzii where id_serviciu=p_id;
+  select avg(rating) into v_stat from recenzii where id_furnizor=p_id;
     return v_stat;
 
 END;
@@ -412,14 +414,14 @@ ELSE
 end if;
 end;
 /
-create or replace procedure add_furnizor (p_nume IN VARCHAR2, p_ora_desc IN VARCHAR2, p_ora_inc IN VARCHAR2, p_tip_serv IN VARCHAR2, p_trust_lvl NUMBER) as
+create or replace procedure add_furnizor (p_nume IN VARCHAR2, p_id_serv INT ,p_ora_desc IN VARCHAR2, p_ora_inc IN VARCHAR2, p_trust_lvl NUMBER) as
 v_id number;
 v_count NUMBER;
 BEGIN
 select count(*) into v_count from furnizori where nume=p_nume;
 if (v_count = 0) then
   select max(id) into v_id from furnizori;
-  insert into furnizori values (v_id+1,p_nume,to_date(p_ora_desc,'HH24:MI'),TO_DATE(p_ora_inc,'HH24:MI'),p_tip_serv,p_trust_lvl,sysdate,sysdate);
+  insert into furnizori values (v_id+1,p_nume,p_id_serv,to_date(p_ora_desc,'HH24:MI'),TO_DATE(p_ora_inc,'HH24:MI'),p_trust_lvl,sysdate,sysdate);
 else
   dbms_output.put_line('furnizorul deja exista');
 end if;
@@ -434,9 +436,9 @@ if (v_count = 0) then
 end if;
 END;
 /
-create or replace function caut_magazin(v_tip varchar2)
+create or replace function caut_magazin(p_tip int)
 return varchar2 as
-CURSOR lista_magazine is select id from FURNIZORI where TIP_SERV = v_tip;
+CURSOR lista_magazine is select id from FURNIZORI where ID_SERVICIU = p_tip;
 v_magazin_id number(4);
 v_magazin varchar2(10);
 v_stat number(10);
@@ -480,11 +482,11 @@ close lista_magazine;
 return v_magazin;
 end;
 /
-create or replace procedure add_serviciu (p_nume IN VARCHAR2, p_tip IN VARCHAR2, p_avg_time VARCHAR2) AS
+create or replace procedure add_serviciu (p_nume IN VARCHAR2, p_avg_time VARCHAR2) AS
 v_id NUMBER;
 BEGIN
 SELECT MAX(id) into v_id from servicii;
-insert into servicii values ( v_id+1, p_nume,p_tip, to_date(p_avg_time,'HH24:MI'),sysdate,sysdate); 
+insert into servicii values ( v_id+1, p_nume, to_date(p_avg_time,'HH24:MI'),sysdate,sysdate); 
 END;
 /
 create or replace procedure add_programare(p_id_cl IN NUMBER, p_id_fur IN NUMBER, p_id_ser IN NUMBER, p_data IN VARCHAR2, p_ora VARCHAR2) AS
@@ -545,6 +547,7 @@ loop
 end loop;
 END;
 /
+
 BEGIN
 DBMS_SCHEDULER.CREATE_JOB (
    job_name           =>  'atendance_auto_update',
@@ -560,7 +563,7 @@ DBMS_SCHEDULER.ENABLE('atendance_auto_update');
 end;
 /
 
-create or replace procedure add_rating  as 
+create or replace procedure add_rating as 
 CURSOR lista_rate is select rating from recenzii;
 v_rate int(3);
 v_ratefinal int(3);
