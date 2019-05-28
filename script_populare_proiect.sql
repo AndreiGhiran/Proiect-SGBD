@@ -226,7 +226,7 @@ end loop;
   
   
 END;
-
+/
 
 CREATE OR REPLACE PROCEDURE calculeaza_trust_factor_single (id_val IN number) AS
 cursor lista_programari is select atendance from programari where id_client=id_val;
@@ -257,7 +257,7 @@ close lista_programari;
 update clienti 
 set trust = v_trust where id = id_val;
 end;
-
+/
 CREATE OR REPLACE PROCEDURE calculeaza_trust_factor_all AS
 CURSOR lista_clienti is select ID, TRUST from CLIENTI;
 CURSOR lista_atendance (p_id NUMBER) is SELECT atendance FROM programari where id_client=p_id;
@@ -293,7 +293,7 @@ update clienti set trust = v_trust where id = v_id;
 END LOOP;
 close lista_clienti;
 end;
-
+/
 CREATE OR REPLACE PROCEDURE statistici_rating_pe_note (p_id IN NUMBER) as
 v_stat NUMBER;
 BEGIN
@@ -304,27 +304,27 @@ BEGIN
   end if;
  end loop;
 END;
-
-CREATE OR REPLACE PROCEDURE statistici_rating_mediu (p_id IN NUMBER) as
+/
+create or replace function statistici_rating_mediu (p_id IN NUMBER) return NUMBER as
 v_stat NUMBER;
 BEGIN
  
   select avg(rating) into v_stat from recenzii where id_serviciu=p_id;
-    DBMS_OUTPUT.PUT_LINE('Rating mediu: '|| v_stat);
+    return v_stat;
 
 END;
-
-create or replace procedure procent_clienti_veniti_la_timp (p_id NUMBER) as
+/
+create or replace function procent_clienti_veniti_la_timp (p_id NUMBER) return FLOAT as
 v_atendance_t NUMBER;
 V_atendance_f NUmber;
 begin
  select count(atendance) into v_atendance_t from programari where id_furnizor = p_id and atendance='TRUE';
  select count(atendance) into v_atendance_f from programari where id_furnizor = p_id and atendance='FALSE';
  if (v_atendance_t + v_atendance_f != 0 ) then
- DBMS_OUTPUT.PUT_LINE( round((v_atendance_t * 100) / (v_atendance_t + v_atendance_f)) || '% din clienti au avenit la programari');
+ return ( round((v_atendance_t * 100) / (v_atendance_t + v_atendance_f)) || '% din clienti au avenit la programari');
  end if;
 end;
-
+/
 CREATE OR REPLACE PROCEDURE cenzurare_all as
 v_text varchar(300);
 v_cuvant varchar(10);
@@ -342,18 +342,20 @@ for v_i in 1..v_size LOOP
   update recenzii set rating_text = v_text where id=v_i;
 end loop;
 END;
-
-CREATE OR REPLACE PROCEDURE cenzurare_imput (p_text IN OUT VARCHAR2) as
+/
+create or replace function cenzurare_imput (p_text VARCHAR2) return varchar2 as
 v_cuvant varchar(10);
+v_text varchar(300);
 TYPE varr IS VARRAY(1000) OF varchar2(255);
 lista_cuvinte_urate varr := varr('pula', 'pizda', 'cacat', 'pisat', 'bulagiu', 'poponar', 'cur', 'curva', 'bou', 'poponar');
 BEGIN
   for v_i in 1..lista_cuvinte_urate.count loop
     v_cuvant := lista_cuvinte_urate(v_i);
-    p_text:=REPLACE(p_text,v_cuvant,'*****');
+    v_text:=REPLACE(p_text,v_cuvant,'*****');
   end loop;
+  return v_text;
 END;
-
+/
 CREATE OR REPLACE PROCEDURE add_client (p_nume IN VARCHAR2, p_prenume IN VARCHAR2 ,p_pass IN VARCHAR2, p_tel varchar2) as 
 v_id number;
 v_count_name number;
@@ -373,7 +375,7 @@ else
   end if;
 end if;
 end;
-
+/
 create or replace procedure schimbare_parola (p_id IN NUMBER, p_old_pass IN VARCHAR2, p_new_pass IN VARCHAR2) as
 v_count_id number;
 v_pass varchar2(100);
@@ -391,7 +393,7 @@ ELSE
   END IF;
 end if;
 end;
-
+/
 create or replace procedure schimbare_tel (p_id IN NUMBER, p_old_pass IN VARCHAR2, p_new_tel IN VARCHAR2) as
 v_count_id number;
 v_pass varchar2(100);
@@ -409,7 +411,7 @@ ELSE
   END IF;
 end if;
 end;
-
+/
 create or replace procedure add_furnizor (p_nume IN VARCHAR2, p_ora_desc IN VARCHAR2, p_ora_inc IN VARCHAR2, p_tip_serv IN VARCHAR2, p_trust_lvl NUMBER) as
 v_id number;
 v_count NUMBER;
@@ -422,7 +424,7 @@ else
   dbms_output.put_line('furnizorul deja exista');
 end if;
 END;
-
+/
 create or replace procedure schimbare_ore (p_id IN NUMBER, p_ora_desc IN VARCHAR2, p_ora_inc IN VARCHAR2) as
 v_count NUMBER;
 BEGIN
@@ -431,59 +433,89 @@ if (v_count = 0) then
   update furnizori set ora_desc = to_date(p_ora_desc,'HH24:MI'), ora_inc = TO_DATE(p_ora_inc,'HH24:MI') where id = p_id;
 end if;
 END;
-
+/
 create or replace function caut_magazin(v_tip varchar2)
 return varchar2 as
-v_magazin varchar2(100);
+CURSOR lista_magazine is select id from FURNIZORI where TIP_SERV = v_tip;
+v_magazin_id number(4);
+v_magazin varchar2(10);
+v_stat number(10);
+v_max_stat NUMBER(10);
 begin
-select tip into v_magazin from servicii WHERE ROWNUM =1 order by rate desc;
+v_max_stat :=0;
+open lista_magazine;
+LOOP
+  fetch lista_magazine into v_magazin_id;
+  EXIT WHEN lista_magazine%NOTFOUND;
+  select avg(rating) into v_stat from recenzii where ID_FURNIZOR=v_magazin_id;
+  if (v_stat > v_max_stat) then
+    v_max_stat := v_stat;
+    select nume into v_magazin from furnizori where id = v_magazin_id;
+  end if;
+END LOOP; 
+close lista_magazine;
 return v_magazin;
 end;
-
-create or replace function caut_magazin_ore(v_tip varchar2,v_ora1 date,v_ora2 date)
-return varchar2 as
-v_magazin varchar2(100);
+/
+create or replace function caut_magazin_ore(v_tip varchar2,v_ora date, v_data DATE)
+return varchar2 AS
+CURSOR lista_magazine is select id_furnizor from programari where to_char(DATA_PROGRAMARE,'dd-mm-yyyy') = to_char(v_data,'dd-mm-yyyy') AND TO_CHAR(ORA_PROGRAMARE,'HH24:MI') != to_char(v_ora,'hh25:mi')  AND id_furnizor in (select id from furnizori where tip_serv=v_tip) group by ID_FURNIZOR minus select id_furnizor from programari where to_char(DATA_PROGRAMARE,'dd-mm-yyyy') = to_char(v_data,'dd-mm-yyyy') AND TO_CHAR(ORA_PROGRAMARE,'HH24:MI') = to_char(v_ora,'HH24:MI') and id_furnizor in (select id from furnizori where tip_serv=v_tip) group by ID_FURNIZOR;
+v_magazin_id number(4);
+v_magazin varchar2(10);
+v_stat number(10);
+v_max_stat NUMBER(10);
 begin
-select tip into v_magazin from servicii WHERE ROWNUM =1 order by rate desc;
+v_max_stat :=0;
+open lista_magazine;
+LOOP
+  fetch lista_magazine into v_magazin_id;
+  EXIT WHEN lista_magazine%NOTFOUND;
+  select avg(rating) into v_stat from recenzii where ID_FURNIZOR=v_magazin_id;
+  if (v_stat > v_max_stat) then
+    v_max_stat := v_stat;
+    select nume into v_magazin from furnizori where id = v_magazin_id;
+  end if;
+END LOOP; 
+close lista_magazine;
 return v_magazin;
 end;
-
+/
 create or replace procedure add_serviciu (p_nume IN VARCHAR2, p_tip IN VARCHAR2, p_avg_time VARCHAR2) AS
 v_id NUMBER;
 BEGIN
 SELECT MAX(id) into v_id from servicii;
 insert into servicii values ( v_id+1, p_nume,p_tip, to_date(p_avg_time,'HH24:MI'),sysdate,sysdate); 
 END;
-
+/
 create or replace procedure add_programare(p_id_cl IN NUMBER, p_id_fur IN NUMBER, p_id_ser IN NUMBER, p_data IN VARCHAR2, p_ora VARCHAR2) AS
 v_in NUMBER;
 BEGIN
 select max(id) into v_in from programari;
 insert into programari values(v_in+1,p_id_cl,p_id_fur,p_id_ser,to_date(p_data,'DD-MM-YYYY'),TO_DATE(p_ora,'HH24:MI'),null,sysdate,sysdate);
 END;
-
+/
 create or replace procedure delete_client(p_id IN NUMBER) AS
 BEGIN
 delete from clienti where id=p_id;
 END;
-
+/
 create or replace procedure delete_furnizor(p_id IN NUMBER) AS
 BEGIN
 delete from furnizori where id=p_id;
 END;
-
+/
 
 create or replace procedure delete_serviciu(p_id IN NUMBER) AS
 BEGIN
 delete from servicii where id=p_id;
 END;
-
+/
 
 create or replace procedure delete_programare(p_id IN NUMBER) AS
 BEGIN
 delete from programari where id=p_id;
 END;
-
+/
 
 create or replace procedure client_atendance (p_id IN NUMBER, p_atendance IN VARCHAR2) AS
 v_id_client NUMBER;
@@ -498,7 +530,7 @@ else
  DBMS_OUTPUT.PUT_LINE('Programare inexistenta');
 end if;
 END;
-
+/
 create or replace procedure atendance_update as
 cursor lista_programari_trecute is select id,id_client from programari where atendance = null and sysdate > data_programare; 
 v_id NUMBER;
@@ -512,7 +544,7 @@ loop
   CALCULEAZA_TRUST_FACTOR_SINGLE(v_id_client);
 end loop;
 END;
-
+/
 BEGIN
 DBMS_SCHEDULER.CREATE_JOB (
    job_name           =>  'atendance_auto_update',
@@ -522,11 +554,11 @@ DBMS_SCHEDULER.CREATE_JOB (
    repeat_interval    =>  'FREQ=DAILY;INTERVAL=1', /* every other day */
    end_date           =>   SYSDATE + 365);
 END;
-
+/
 begin
 DBMS_SCHEDULER.ENABLE('atendance_auto_update');
 end;
-
+/
 
 create or replace procedure add_rating  as 
 CURSOR lista_rate is select rating from recenzii;
@@ -541,7 +573,7 @@ FETCH lista_rate into v_rate;
 end loop;
 close lista_rate;
 end;
-
+/
 
 create or replace function procent_clienti
 return float as 
@@ -550,8 +582,7 @@ begin
 select (select count(unique( id_client)) from RECENZII)/(select count(*) from clienti) into v_procent from dual; 
 return v_procent;
 end;
-
-
+/
 create or replace function procent_clienti_magazin(id_furn number) 
 return float as 
 v_procent float(20);
@@ -559,4 +590,7 @@ begin
 select (select count(unique( id_client)) from RECENZII where id_furnizor=id_furn)/(select count(*) from clienti) into v_procent from dual; 
 return v_procent;
 end;
-
+/
+begin
+CALCULEAZA_TRUST_FACTOR_ALL;
+end;
