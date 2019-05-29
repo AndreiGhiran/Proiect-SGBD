@@ -58,8 +58,8 @@ session_start();
  <form action="index.php" method="post">
   <input type="text" name="register_username" placeholder="Nume"><br>
   <input type="text" name="register_userpname" placeholder="Prenume"><br>
-  <input type="text" name="register_email" placeholder="Email"><br>
-  <input type="text" name="register_telefon" placeholder="Teledfon"><br>
+  <input type="text" name="register_email" placeholder="Telefon"><br>
+  <input type="text" name="register_telefon" placeholder="Email"><br>
   <input type="password" name="register_password" placeholder="Parola"><br>
   <input type="password" name="register_passwordd" placeholder="Confirm Parola"><br><br>
   <button type="submit" name="register_submit">Register</button>

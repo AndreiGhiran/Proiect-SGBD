@@ -7,7 +7,7 @@ $username = "STUDENT";                  // Use your username
 $password = "STUDENT";             // and your password
 $database = "localhost/XE";   // and the connect string to connect to your database
  
-$query = "select * from clienti";
+$query = "select * from clienti order by id desc";
  
 $c = oci_connect($username, $password, $database);
 if (!$c) {
