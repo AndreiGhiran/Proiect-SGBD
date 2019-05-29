@@ -330,14 +330,16 @@ BEGIN
 
 END;
 /
-create or replace function procent_clienti_veniti_la_timp (p_id NUMBER) return FLOAT as
+create or replace function procent_clienti_veniti_la_timp (p_id NUMBER) return NUMBER as
 v_atendance_t NUMBER;
 V_atendance_f NUmber;
 begin
  select count(atendance) into v_atendance_t from programari where id_furnizor = p_id and atendance='TRUE';
  select count(atendance) into v_atendance_f from programari where id_furnizor = p_id and atendance='FALSE';
  if (v_atendance_t + v_atendance_f != 0 ) then
- return ( round((v_atendance_t * 100) / (v_atendance_t + v_atendance_f)) || '% din clienti au avenit la programari');
+ return round((v_atendance_t * 100) / (v_atendance_t + v_atendance_f));
+ else
+ return 0;
  end if;
 end;
 /
@@ -360,14 +362,15 @@ end loop;
 END;
 /
 create or replace function cenzurare_imput (p_text VARCHAR2) return varchar2 as
-v_cuvant varchar(10);
-v_text varchar(300);
+v_cuvant varchar2(100);
+v_text varchar2(300);
 TYPE varr IS VARRAY(1000) OF varchar2(255);
 lista_cuvinte_urate varr := varr('pula', 'pizda', 'cacat', 'pisat', 'bulagiu', 'poponar', 'cur', 'curva', 'bou', 'poponar');
 BEGIN
+  v_text:=p_text;
   for v_i in 1..lista_cuvinte_urate.count loop
     v_cuvant := lista_cuvinte_urate(v_i);
-    v_text:=REPLACE(p_text,v_cuvant,'*****');
+    v_text:=REPLACE(v_text,v_cuvant,'*****');
   end loop;
   return v_text;
 END;
@@ -410,7 +413,7 @@ ELSE
 end if;
 end;
 /
-create or replace procedure schimbare_tel (p_id IN NUMBER, p_old_pass IN VARCHAR2, p_new_tel IN VARCHAR2) as
+create or replace procedure schimbare_tel (p_id IN NUMBER, p_pass IN VARCHAR2, p_new_tel IN VARCHAR2) as
 v_count_id number;
 v_pass varchar2(100);
 begin
@@ -420,7 +423,7 @@ if (v_count_id = 0) then
   RETURN;
 ELSE
   select pass into v_pass from CLIENTI where id=p_id;
-  if (v_pass = p_old_pass) then
+  if (v_pass = p_pass) then
    update clienti set telefon = p_new_tel where id = p_id;
   else
    DBMS_OUTPUT.PUT_LINE('PAROLA INCORECTA');
@@ -496,6 +499,14 @@ close lista_magazine;
 return v_magazin;
 end;
 /
+create or replace function ora_libera_magazin(p_id_f int, p_id_s int, p_data varchar2, p_ora varchar2) return int as
+v_id int;
+BEGIN
+  v_id :=0;
+  select count(id) into v_id from programari where id_furnizor=p_id_f and id_serviciu = p_id_s and to_char(data_programare,'dd-mm-yyyy') = p_data and to_char(ora_programare,'hh24:mi') = p_ora;
+  return v_id;
+END;
+/
 create or replace procedure add_serviciu (p_nume IN VARCHAR2, p_avg_time VARCHAR2) AS
 v_id NUMBER;
 BEGIN
@@ -510,11 +521,13 @@ select max(id) into v_in from programari;
 insert into programari values(v_in+1,p_id_cl,p_id_fur,p_id_ser,to_date(p_data,'DD-MM-YYYY'),TO_DATE(p_ora,'HH24:MI'),null,sysdate,sysdate);
 END;
 /
-create or replace procedure add_review(id_client in number, p_id_fur IN NUMBER, p_id_ser IN NUMBER,v_rate in number ,v_text in varchar2) AS
+create or replace procedure add_review(id_client in number, p_id_fur IN NUMBER, p_id_ser IN NUMBER,p_rate in number ,p_text in varchar2) AS
 v_in NUMBER;
+v_text varchar(300);
 BEGIN
 select max(id) into v_in from programari;
-insert into recenzii values(v_in+1,id_client,p_id_fur,p_id_ser,v_rate,v_text,sysdate,sysdate);
+v_text := CENZURARE_IMPUT(p_text);
+insert into recenzii values(v_in+1,id_client,p_id_fur,p_id_ser,p_rate,v_text,sysdate,sysdate);
 END;
 /
 create or replace procedure delete_client(p_id IN NUMBER) AS
@@ -527,10 +540,9 @@ BEGIN
 delete from furnizori where id=p_id;
 END;
 /
-
-create or replace procedure delete_serviciu(p_id IN NUMBER) AS
+create or replace procedure delete_serviciu(p_nume IN VARCHAR2) AS
 BEGIN
-delete from servicii where id=p_id;
+delete from servicii where tip=p_nume;
 END;
 /
 create or replace procedure delete_review(p_id IN NUMBER) AS
@@ -596,13 +608,12 @@ select max(id) into v_id from recenzii;
 insert into recenzii values(v_id,p_id_cl,p_id_f,p_id_s,p_r,p_rt,sysdate,sysdate);
 end;
 /
-
 create or replace function procent_clienti
 return float as 
 v_procent float(20);
 begin
-select (select count(unique( id_client)) from RECENZII)/(select count(*) from clienti) into v_procent from dual; 
-return v_procent;
+select ((select count(unique( id_client)) from RECENZII)*100)/(select count(*) from clienti) into v_procent from dual; 
+return round(v_procent);
 end;
 /
 create or replace function procent_clienti_magazin(id_furn number) 
@@ -627,15 +638,3 @@ end;
 begin
 CALCULEAZA_TRUST_FACTOR_ALL;
 end;
-
-delete from programari where id = 1145;
-commit;
-
-
-begin
-ADD_Review(1001,23,120,5,'good');
-end;
-select * from clienti where id = 1001;
-select * from furnizori where id_serviciu=120;
-select * from servicii where id = 120;
-select * from recenzii where id_client=1001;
