@@ -48,10 +48,17 @@
 
 
 <h2>Schimba parola </h2>
+<<<<<<< HEAD
  <form action="indexx.php" method="post">
  <input type="password" name="oldpassword" placeholder="Vechea parola"><br><br>
   <input type="password" name="newpassword" placeholder="Noua parola"><br><br>
   <button type="submit" name="pass_chng_submit">Schimba parola</button>
+
+ <form action="indexx.php">
+ <input type="password" name="oldpassword" placeholder="Vechea parola"><br><br>
+  <input type="password" name="newpassword" placeholder="Noua parola"><br><br>
+  <input type="submit" name="schimbaparola" value="Submit">
+
 </form> 
 <br><br>
  <form action="indexx.php" method="post">
