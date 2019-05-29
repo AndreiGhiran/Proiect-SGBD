@@ -152,7 +152,7 @@ BEGIN
       END LOOP;
 
       v_temp:=0;
-      v_email := replace(lower(v_nume ||'.'|| v_prenume),' ','');
+      v_email := replace(lower(v_nume ||'.'|| v_prenume),' ','_');
       LOOP         
          select count(*) into v_temp from clienti where email = v_email;
          exit when v_temp=0;
