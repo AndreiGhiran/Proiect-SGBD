@@ -33,11 +33,11 @@
 
 <ul>
 
-<li><a href="indexx.html"> Acasa</a></li>
-<li><a href="p11.html"> Programari</a></li>
-<li><a href="p22.html"> Cauta</a></li>
-<li><a href="p33.html">Cont</a></li>
-<li><a href="p44.html"> Contact</a></li>
+<li><a href="indexx.php"> Acasa</a></li>
+<li><a href="p11.php"> Programari</a></li>
+<li><a href="p22.php"> Cauta</a></li>
+<li><a href="p33.php">Cont</a></li>
+<li><a href="p44.php"> Contact</a></li>
 
 </ul>
 
@@ -48,14 +48,14 @@
 
 
 <h2>Schimba parola </h2>
- <form action="#f4.php">
+ <form action="indexx.php" method="post">
  <input type="password" name="oldpassword" placeholder="Vechea parola"><br><br>
   <input type="password" name="newpassword" placeholder="Noua parola"><br><br>
-  <input type="submit" value="Submit">
+  <button type="submit" name="pass_chng_submit">Schimba parola</button>
 </form> 
 <br><br>
  <form action="indexx.php" method="post">
-  <input type="submit"  name="submit" value="Log out">
+  <input type="submit"  name="Logout_submit" value="Log out">
 </form>
 </aside>
 
@@ -83,6 +83,9 @@ la care sunt cele mai multe solicitari de servicii.
 </html>
 <?php
  
+ 
+ $conn = oci_connect('STUDENT','STUDENT','localhost/XE') or die;
+ 
  function LogOut ()
  {
 	 session_start();
@@ -90,9 +93,28 @@ la care sunt cele mai multe solicitari de servicii.
 	 unset($_SESSION['id']);
 	 header('location: index.php');
  }
+ 
+ function ChangePass()
+ {
+	 global $conn;
+	 $id = $_SESSION['id'];
+	 echo "<p>" . $id . "</p>"; 
+	 $old_pass = $_POST['oldpassword'];
+	 $new_pass = $_POST['newpassword'];
+	 $sql = 'BEGIN schimbare_parola(:id, :old_pass, :new_pass); END;';
+	 $stmt = oci_parse($conn, $sql);
+	 oci_bind_by_name($stmt,':id',$id,32);
+	 oci_bind_by_name($stmt,':old_pass',$old_pass,32);
+	 oci_bind_by_name($stmt,':new_pass',$new_pass,32);
+	 oci_execute($stmt);
+ }
 
-if(isset($_POST['submit']))
+if(isset($_POST['Logout_submit']))
 {
 	LogOut();
+}
+if (isset($_POST['pass_chng_submit']))
+{
+	ChangePass();
 }
 ?>
