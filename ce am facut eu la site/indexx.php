@@ -33,11 +33,11 @@
 
 <ul>
 
-<li><a href="indexx.html"> Acasa</a></li>
-<li><a href="p11.html"> Programari</a></li>
-<li><a href="p22.html"> Cauta</a></li>
-<li><a href="p33.html">Cont</a></li>
-<li><a href="p44.html"> Contact</a></li>
+<li><a href="indexx.php"> Acasa</a></li>
+<li><a href="p11.php"> Programari</a></li>
+<li><a href="p22.php"> Cauta</a></li>
+<li><a href="p33.php">Cont</a></li>
+<li><a href="p44.php"> Contact</a></li>
 
 </ul>
 
