@@ -1,8 +1,46 @@
 <?php
- session_start(); 
- if($_SESSION['user'] == NULL) {
-  header('Location: index.php');
-                                    } 
+ session_start(); //starts all the sessions 
+ if($_SESSION['id'] == NULL) {
+  header('Location: index.php'); //take user to the login page if there's no information stored in session variable
+      } 
+	
+
+	$conn = oci_connect('STUDENT','STUDENT','localhost/XE') or die; 
+
+
+function Afiseaza_programri()
+{
+		global $conn;
+		$id = $_SESSION['id']; 
+		$sql = "select (select nume from furnizori where id=id_furnizor)\"Furnizor\",(select tip from servicii where id=id_serviciu)\"Serviciu\",to_char(data_programare,'dd-mm-yy')\"Data Programarii\",to_char(ora_programare,'HH24:MI')\"Ora Programarii\" from programari where id_client = 267 order by\"Data Programarii\",\"Ora Programarii\"";
+	    $stmt = oci_parse($conn,$sql);
+		$r = oci_execute($stmt);
+		if (!$r) {
+		$m = oci_error($stmt);
+		trigger_error('Could not execute statement: '. $m['message'], E_USER_ERROR);
+		}
+ 
+		echo "<table border='1'>\n";
+        $ncols = oci_num_fields($stmt);
+        echo "<tr>\n";
+        for ($i = 1; $i <= $ncols; ++$i) {
+         $colname = oci_field_name($stmt, $i);
+          echo "  <th><b>".htmlspecialchars($colname,ENT_QUOTES|ENT_SUBSTITUTE)."</b></th>\n";
+        }
+        echo "</tr>\n";
+ 
+    while (($row = oci_fetch_array($stmt, OCI_ASSOC+OCI_RETURN_NULLS)) != false) {
+    echo "<tr>\n";
+    foreach ($row as $item) {
+        echo "<td>";
+        echo $item!==null?htmlspecialchars($item, ENT_QUOTES|ENT_SUBSTITUTE):"&nbsp;";
+        echo "</td>\n";
+    }
+    echo "</tr>\n";
+}
+echo "</table>\n";
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -68,6 +106,17 @@
   <input type="submit" name="afiseazaprogramari" value="Afiseaza programari">
 </form>
 
+<?php
+
+
+if(isset($_POST['afiseazaprogramari']))
+{
+	Afiseaza_programri();
+}
+
+
+?>
+
 
 </sectionn>
 
@@ -78,7 +127,6 @@
 
 </html>
 <?php
- $conn = oci_connect('STUDENT','STUDENT','localhost/XE') or die;
 
 function Adauga_programare()
 {
@@ -100,25 +148,13 @@ $sterg_idp = $_POST['sterg_idp'];
 	
 }
 
-function Afiseaza_programri()
-{
-		global $conn;
-
-	
-}
-
 if(isset($_POST['adaugaprogramare']))
 {
 	Adauga_programare();
 }
-else
+
 if(isset($_POST['stergeprogramare']))
 {
 	Sterge_programare();
-}
-else
-if(isset($_POST['afiseazaprogramari']))
-{
-	Afiseaza_programri();
 }
 ?>
