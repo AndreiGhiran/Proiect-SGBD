@@ -6,10 +6,10 @@ else
 {
 $username=$_POST['username'];
 $password=$_POST['password'];
-$nrtel=$_POSt['telefon'];
+$nrtel=$_POST['telefon'];
 $passwordd=$_POST['passwordd'];
 $email=$_POST['email'];
-$stid=oci_parse($conn, 'begin register(:username, :password,:telefon,:email); end;');
+$stid=oci_parse($conn, 'begin add_clien(:username, :password, :telefon, :email); end;');
  oci_execute($stid);
 }
 oci_close($conn);
