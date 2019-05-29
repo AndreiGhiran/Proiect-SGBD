@@ -1,7 +1,7 @@
 <?php
- session_start(); //starts all the sessions 
+ session_start(); 
  if($_SESSION['user'] == NULL) {
-  header('Location: index.php'); //take user to the login page if there's no information stored in session variable
+  header('Location: index.php'); 
                                     } 
 ?>
 <!DOCTYPE html>
@@ -48,14 +48,14 @@
 
 
 <h2>Schimba parola </h2>
- <form action="indexx.php" method="post">
+ <form action="indexx.php">
  <input type="password" name="oldpassword" placeholder="Vechea parola"><br><br>
   <input type="password" name="newpassword" placeholder="Noua parola"><br><br>
-  <button type="submit" name="pass_chng_submit">Schimba parola</button>
+  <input type="submit" name="pass_chng_submit" value="Submit">
 </form> 
 <br><br>
  <form action="indexx.php" method="post">
-  <input type="submit"  name="Logout_submit" value="Log out">
+  <input type="submit"  name="submit" value="Log out">
 </form>
 </aside>
 
@@ -83,9 +83,6 @@ la care sunt cele mai multe solicitari de servicii.
 </html>
 <?php
  
- 
- $conn = oci_connect('STUDENT','STUDENT','localhost/XE') or die;
- 
  function LogOut ()
  {
 	 session_start();
@@ -108,11 +105,12 @@ la care sunt cele mai multe solicitari de servicii.
 	 oci_bind_by_name($stmt,':new_pass',$new_pass,32);
 	 oci_execute($stmt);
  }
-
-if(isset($_POST['Logout_submit']))
+ 
+if(isset($_POST['submit']))
 {
 	LogOut();
 }
+else
 if (isset($_POST['pass_chng_submit']))
 {
 	ChangePass();

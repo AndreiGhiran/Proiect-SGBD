@@ -1,7 +1,7 @@
 <?php
- session_start(); //starts all the sessions 
+ session_start(); 
  if($_SESSION['user'] == NULL) {
-  header('Location: index.php'); //take user to the login page if there's no information stored in session variable
+  header('Location: index.php');
                                     } 
 ?>
 
@@ -51,10 +51,10 @@
  <form action="p44.php">
  <input type="password" name="oldpassword" placeholder="Vechea parola"><br><br>
   <input type="password" name="newpassword" placeholder="Noua parola"><br><br>
-  <input type="submit" name="schimbaparola" value="Submit">
+  <input type="submit" name="pass_chng_submit" value="Submit">
 </form>  
 <br><br>
- <form action="index.php" method="post">
+ <form action="indexx.php" method="post">
   <input type="submit"  name="submit" value="Log out">
 </form>
 
@@ -73,3 +73,24 @@ Ghiran Andrei -andrei.ghiran@uaic.ro</h2>
 
 
 </html>
+<?php
+ function ChangePass()
+ {
+	 global $conn;
+	 $id = $_SESSION['id'];
+	 echo "<p>" . $id . "</p>"; 
+	 $old_pass = $_POST['oldpassword'];
+	 $new_pass = $_POST['newpassword'];
+	 $sql = 'BEGIN schimbare_parola(:id, :old_pass, :new_pass); END;';
+	 $stmt = oci_parse($conn, $sql);
+	 oci_bind_by_name($stmt,':id',$id,32);
+	 oci_bind_by_name($stmt,':old_pass',$old_pass,32);
+	 oci_bind_by_name($stmt,':new_pass',$new_pass,32);
+	 oci_execute($stmt);
+ }
+
+if (isset($_POST['pass_chng_submit']))
+{
+	ChangePass();
+}
+?>

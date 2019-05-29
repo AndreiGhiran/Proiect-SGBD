@@ -1,8 +1,8 @@
 <?php 
 error_reporting(E_ERROR | E_PARSE);
-session_start(); //starts all the sessions 
+session_start(); 
         if($_SESSION['user'] != NULL) {
-            header('Location: indexx.php'); //take user to the details page if already logged in
+            header('Location: indexx.php'); 
         } ?>
 
 <!DOCTYPE html>
@@ -76,8 +76,7 @@ session_start(); //starts all the sessions
 
  <?php
  $conn = oci_connect('STUDENT','STUDENT','localhost/XE') or die;
-	//	include("Header.php");
-	//	include("Navbar.php");
+
 function LogIn ()
 {
 	global $conn;

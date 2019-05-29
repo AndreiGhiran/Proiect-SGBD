@@ -1,7 +1,7 @@
 <?php
- session_start(); //starts all the sessions 
+ session_start(); 
  if($_SESSION['user'] == NULL) {
-  header('Location: index.php'); //take user to the login page if there's no information stored in session variable
+  header('Location: index.php');
                                     } 
 ?>
 
@@ -79,8 +79,6 @@
 </html>
 <?php
  $conn = oci_connect('STUDENT','STUDENT','localhost/XE') or die;
-	//	include("Header.php");
-	//	include("Navbar.php");
 
 function Adauga_programare()
 {

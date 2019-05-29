@@ -1,8 +1,8 @@
 <?php 
 error_reporting(E_ERROR | E_PARSE);
-session_start(); //starts all the sessions 
+session_start(); 
         if($_SESSION['user'] != NULL) {
-            header('Location: indexx.php'); //take user to the details page if already logged in
+            header('Location: indexx.php'); 
         } ?>
 		
 <!DOCTYPE html>
@@ -94,8 +94,7 @@ la care sunt cele mai multe solicitari de servicii.
 
  <?php
  $conn = oci_connect('STUDENT','STUDENT','localhost/XE') or die;
-	//	include("Header.php");
-	//	include("Navbar.php");
+
 function LogIn ()
 {
 	global $conn;
@@ -139,9 +138,9 @@ function Register()
 	$tel = $_POST['register_telefon'];
 	$pass = $_POST['register_password'];
     $passd = $_POST['register_passwordd'];
-	if ($pass == $passd and $pass != NULL)
+	if ($pass == $passd)
 	{
-	$sql = 'BEGIN add_client(:username, :userpname, :password, :email, :tel); END;';
+	$sql = 'BEGIN add_client(:username, :userpname, :password, :email, :tel); commit; END;';
 	$stmt = oci_parse($conn,$sql);
 	oci_bind_by_name($stmt,':username',$name,32);
 	oci_bind_by_name($stmt,':userpname',$pname,32);
