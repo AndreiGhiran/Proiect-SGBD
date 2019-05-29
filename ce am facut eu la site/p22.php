@@ -120,7 +120,7 @@ function Adauga_review()
 				 $id = $_SESSION['id'];
 $adaug_ids = $_POST['adaug_ids'];
 $adaug_text = $_POST['adaug_text'];
-	 $sql = "BEGIN add_review(:id, :adaug_ids, :adaug_nota,:adaug_idm,:adaug_text); END;";
+	 $sql = "BEGIN add_review(:id, :adaug_idm,:adaug_ids,:adaug_nota,:adaug_text); END;";
 	 $stmt = oci_parse($conn, $sql);
 	 oci_bind_by_name($stmt,':id',$id,32);
 	 oci_bind_by_name($stmt,':adaug_ids',$adaug_ids,32);
@@ -290,6 +290,7 @@ if(isset($_POST['caut_magazin_id']))
  <form action="p22.php" method="post">
   <input type="user" name="adaug_idm" placeholder="Id magazin"><br><br>
     <input type="user" name="adaug_ids" placeholder="Id serviciu"><br><br>
+		   <input type="user" name="adaug_nota" placeholder="Nota"><br><br>
 	   <input type="user" name="adaug_text" placeholder="Review"><br><br>
   <input type="submit" name="adaugareview" value="Submit">
 </form>
