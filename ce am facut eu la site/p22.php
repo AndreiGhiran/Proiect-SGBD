@@ -205,19 +205,6 @@ $procentaj_ids = $_POST['procentaj_ids'];
 
 }
 
-function LogOut ()
- {
-	 session_start();
-	 unset($_SESSION['user']);
-	 unset($_SESSION['id']);
-	 header('location: index.php');
- }
-
-if(isset($_POST['submit']))
-{
-	LogOut();
-}
-else
 if(isset($_POST['cautmagazin']))
 {
 	Caut_magazin();
