@@ -510,6 +510,13 @@ select max(id) into v_in from programari;
 insert into programari values(v_in+1,p_id_cl,p_id_fur,p_id_ser,to_date(p_data,'DD-MM-YYYY'),TO_DATE(p_ora,'HH24:MI'),null,sysdate,sysdate);
 END;
 /
+create or replace procedure add_review(id_client in number, p_id_fur IN NUMBER, p_id_ser IN NUMBER,v_rate in number ,v_text in varchar2) AS
+v_in NUMBER;
+BEGIN
+select max(id) into v_in from programari;
+insert into recenzii values(v_in+1,id_client,p_id_fur,p_id_ser,v_rate,v_text,sysdate,sysdate);
+END;
+/
 create or replace procedure delete_client(p_id IN NUMBER) AS
 BEGIN
 delete from clienti where id=p_id;
@@ -524,6 +531,11 @@ END;
 create or replace procedure delete_serviciu(p_id IN NUMBER) AS
 BEGIN
 delete from servicii where id=p_id;
+END;
+/
+create or replace procedure delete_review(p_id IN NUMBER) AS
+BEGIN
+delete from recenzii where id=p_id;
 END;
 /
 
@@ -622,3 +634,6 @@ end;
 begin
 CALCULEAZA_TRUST_FACTOR_ALL;
 end;
+
+select * from clienti where id=3;
+
