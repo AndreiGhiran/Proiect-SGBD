@@ -34,11 +34,11 @@ session_start(); //starts all the sessions
 
 <ul>
 
-<li><a href="index.html"> Acasa</a></li>
-<li><a href="p1.html"> Programari</a></li>
-<li><a href="p2.html"> Cauta</a></li>
-<li><a href="p3.html">Cont</a></li>
-<li><a href="p4.html"> Contact</a></li>
+<li><a href="index.php"> Acasa</a></li>
+<li><a href="p1.php"> Programari</a></li>
+<li><a href="p2.php"> Cauta</a></li>
+<li><a href="p3.php">Cont</a></li>
+<li><a href="p4.php"> Contact</a></li>
 
 </ul>
 
@@ -139,9 +139,9 @@ function Register()
 	$tel = $_POST['register_telefon'];
 	$pass = $_POST['register_password'];
     $passd = $_POST['register_passwordd'];
-	if ($pass == $passd)
+	if ($pass == $passd and $pass != NULL)
 	{
-	$sql = 'BEGIN add_client(:username, :userpname, :password, :email, :tel); commit; END;';
+	$sql = 'BEGIN add_client(:username, :userpname, :password, :email, :tel); END;';
 	$stmt = oci_parse($conn,$sql);
 	oci_bind_by_name($stmt,':username',$name,32);
 	oci_bind_by_name($stmt,':userpname',$pname,32);
