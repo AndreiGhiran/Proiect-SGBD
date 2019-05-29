@@ -48,10 +48,10 @@
 
 
 <h2>Schimba parola </h2>
- <form action="#f4.php">
+ <form action="indexx.php">
  <input type="password" name="oldpassword" placeholder="Vechea parola"><br><br>
   <input type="password" name="newpassword" placeholder="Noua parola"><br><br>
-  <input type="submit" value="Submit">
+  <input type="submit" name="schimbaparola" value="Submit">
 </form> 
 <br><br>
  <form action="indexx.php" method="post">

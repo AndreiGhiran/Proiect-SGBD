@@ -34,11 +34,11 @@ session_start(); //starts all the sessions
 
 <ul>
 
-<li><a href="index.html"> Acasa</a></li>
-<li><a href="p1.html"> Programari</a></li>
-<li><a href="p2.html"> Cauta</a></li>
-<li><a href="p3.html">Cont</a></li>
-<li><a href="p4.html"> Contact</a></li>
+<li><a href="index.php"> Acasa</a></li>
+<li><a href="p1.php"> Programari</a></li>
+<li><a href="p2.php"> Cauta</a></li>
+<li><a href="p3.php">Cont</a></li>
+<li><a href="p4.php"> Contact</a></li>
 
 </ul>
 

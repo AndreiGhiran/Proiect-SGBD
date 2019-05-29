@@ -1,0 +1,107 @@
+<?php
+ session_start(); //starts all the sessions 
+ if($_SESSION['user'] == NULL) {
+  header('Location: index.php'); //take user to the login page if there's no information stored in session variable
+                                    } 
+?>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="styleSheet.css">
+<title>LineUp</title>
+</head>
+
+
+<body>
+
+<main>
+
+
+<input type="checkbox" id="newsButton">
+
+<label for="newsButton">  </label>
+
+
+<nav>
+
+<input type="checkbox" id="menuButton">
+
+<label for="menuButton">  </label>
+
+
+<ul>
+
+<li><a href="indexx.php"> Acasa</a></li>
+<li><a href="p11.php"> Programari</a></li>
+<li><a href="p22.php"> Cauta</a></li>
+<li><a href="p33.php">Cont</a></li>
+<li><a href="p44.php"> Contact</a></li>
+
+</ul>
+
+
+</nav>
+
+<sectionn>
+<h3> Cont </h3>
+<h3>Informatii:<br>
+ <form action="f14.php">
+  <input type="submit" value="Afiseaza informatii">
+</form> 
+<br>
+</h3>
+<h2>Schimba parola </h2>
+ <form action="p33.php">
+ <input type="password" name="oldpassword" placeholder="Vechea parola"><br><br>
+  <input type="password" name="newpassword" placeholder="Noua parola"><br><br>
+  <input type="submit" name="schimbaparola" value="Submit">
+</form> 
+<h2>Schimba emailul </h2>
+ <form action="f6.php">
+  <input type="text" name="email" placeholder="Noul email"><br><br>
+  <input type="password" name="password" placeholder="Parola"><br><br>
+  <input type="submit" value="Submit">
+</form>
+
+<h2>Schimba usernameul </h2>
+ <form action="f5.php">
+  <input type="user" name="nume" placeholder="Noul nume"><br><br>
+    <input type="password" name="password" placeholder="Parola"><br><br>
+  <input type="submit" value="Submit">
+</form>
+
+<h2>Schimba numarul de telefon </h2>
+ <form action="f9.php">
+  <input type="user" name="nume" placeholder="Noul telefon"><br><br>
+    <input type="password" name="password" placeholder="Parola"><br><br>
+  <input type="submit" value="Submit">
+</form>
+
+<h2>Adauga furnizor </h2>
+ <form action="f7.php">
+  <input type="user" name="nume" placeholder="Nume furnizor"><br><br>
+  <input type="submit" value="Submit">
+</form>
+
+<h2>Adauga serviciu </h2>
+ <form action="f13.php">
+  <input type="user" name="nume" placeholder="Nume serviciu"><br><br>
+  <input type="submit" value="Submit">
+</form>
+
+<br><br>
+ <form action="f12.php">
+  <input type="submit" value="Log out">
+</form>
+
+</sectionn>
+
+</main>
+
+</body>
+
+
+</html>
