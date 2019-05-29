@@ -196,7 +196,7 @@ BEGIN
 LOOP
     v_client := TRUNC(DBMS_RANDOM.VALUE(1,1000));
          v_furniz := TRUNC(DBMS_RANDOM.VALUE(1,200));
-         v_serv := TRUNC(DBMS_RANDOM.VALUE(1,100));
+         select id_serviciu into v_serv from furnizori where id=v_furniz;
          select count(*) into v_temp from programari where id_furnizor=v_furniz and id_serviciu=v_serv and id_client=v_client;
          exit when v_temp=0;
       END LOOP;
@@ -230,8 +230,8 @@ end loop;
     
     LOOP
     v_client := TRUNC(DBMS_RANDOM.VALUE(1,1000));
-         v_furniz := TRUNC(DBMS_RANDOM.VALUE(1,200));
-        v_serv := TRUNC(DBMS_RANDOM.VALUE(1,100));
+        v_furniz := TRUNC(DBMS_RANDOM.VALUE(1,200));
+        select id_serviciu into v_serv from furnizori where id=v_furniz;
          v_rating := TRUNC(DBMS_RANDOM.VALUE(-1,11));
          select count(*) into v_temp from recenzii where id_furnizor=v_furniz and id_serviciu=v_serv and rating=v_rating and id_client=v_client;
          exit when v_temp=0;
@@ -539,7 +539,7 @@ delete from recenzii where id=p_id;
 END;
 /
 
-create or replace procedure delete_programare(p_id IN NUMBER) AS
+create or replace procedure delete_programare(p_id IN INT) AS
 BEGIN
 delete from programari where id=p_id;
 END;
@@ -589,18 +589,11 @@ DBMS_SCHEDULER.ENABLE('atendance_auto_update');
 end;
 /
 
-create or replace procedure add_rating as 
-CURSOR lista_rate is select rating from recenzii;
-v_rate int(3);
-v_ratefinal int(3);
-begin
-loop
-FETCH lista_rate into v_rate;
-    EXIT WHEN lista_rate%NOTFOUND;
-    
-    
-end loop;
-close lista_rate;
+create or replace procedure add_rating(p_id_cl IN int, p_id_f IN INT, p_id_s IN INT, p_r IN NUMBER, p_rt VARCHAR2) as 
+v_id int;
+BEGIN
+select max(id) into v_id from recenzii;
+insert into recenzii values(v_id,p_id_cl,p_id_f,p_id_s,p_r,p_rt,sysdate,sysdate);
 end;
 /
 
@@ -635,5 +628,14 @@ begin
 CALCULEAZA_TRUST_FACTOR_ALL;
 end;
 
-select * from clienti where id=3;
+delete from programari where id = 1145;
+commit;
 
+
+begin
+ADD_Review(1001,23,120,5,'good');
+end;
+select * from clienti where id = 1001;
+select * from furnizori where id_serviciu=120;
+select * from servicii where id = 120;
+select * from recenzii where id_client=1001;
