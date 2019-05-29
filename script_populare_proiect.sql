@@ -113,7 +113,7 @@ DECLARE
   v_index int;
   v_rating NUMBER(3);
   v_temp_date date;
-  v_email varchar2(40);
+  v_email varchar2(100);
 BEGIN
 
   --populare clienti
@@ -151,16 +151,16 @@ BEGIN
          exit when v_temp=0;
       END LOOP;
 
-      v_temp:='';
-      v_email := lower(v_nume ||'.'|| v_prenume);
+      v_temp:=0;
+      v_email := replace(lower(v_nume ||'.'|| v_prenume),' ','');
       LOOP         
-         select count(*) into v_temp from clienti where email = v_email||v_temp;
+         select count(*) into v_temp from clienti where email = v_email;
          exit when v_temp=0;
          v_temp :=  TRUNC(DBMS_RANDOM.VALUE(0,100));
       END LOOP;    
       
-      if (TRUNC(DBMS_RANDOM.VALUE(0,2))=0) then v_email := v_email ||'@gmail.com';
-         else v_email := v_email ||'@yahoo.ro';
+      if (TRUNC(DBMS_RANDOM.VALUE(0,2))=0) then v_email := v_email || '@gmail.com';
+         else v_email := v_email || '@yahoo.ro';
       end if;
 
   insert into clienti values(v_i, v_nume, v_prenume, v_parola ,v_matr, v_email ,v_trust , sysdate, sysdate);
