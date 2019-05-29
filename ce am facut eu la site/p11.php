@@ -3,16 +3,15 @@
  if($_SESSION['id'] == NULL) {
   header('Location: index.php'); //take user to the login page if there's no information stored in session variable
       } 
-	
+	 $conn = oci_connect('STUDENT','STUDENT','localhost/XE') or die; 
 
-	$conn = oci_connect('STUDENT','STUDENT','localhost/XE') or die; 
 
 
 function Afiseaza_programri()
 {
 		global $conn;
 		$id = $_SESSION['id']; 
-		$sql = "select (select nume from furnizori where id=id_furnizor)\"Furnizor\",(select tip from servicii where id=id_serviciu)\"Serviciu\",to_char(data_programare,'dd-mm-yy')\"Data Programarii\",to_char(ora_programare,'HH24:MI')\"Ora Programarii\" from programari where id_client = 267 order by\"Data Programarii\",\"Ora Programarii\"";
+		$sql = "select (select nume from furnizori where id=id_furnizor)\"Furnizor\",(select tip from servicii where id=id_serviciu)\"Serviciu\",to_char(data_programare,'dd-mm-yy')\"Data Programarii\",to_char(ora_programare,'HH24:MI')\"Ora Programarii\" from programari where id_client = ".$id."order by\"Data Programarii\",\"Ora Programarii\"";
 	    $stmt = oci_parse($conn,$sql);
 		$r = oci_execute($stmt);
 		if (!$r) {
