@@ -453,6 +453,9 @@ if (v_count = 0) then
 end if;
 END;
 /
+begin
+dbms_output.put_line(caut_magazin(123219));
+end;
 create or replace function caut_magazin(p_tip int)
 return varchar2 as
 CURSOR lista_magazine is select id from FURNIZORI where ID_SERVICIU = p_tip;
@@ -473,7 +476,14 @@ LOOP
   end if;
 END LOOP; 
 close lista_magazine;
+if (v_magazin != NULL) then
 return v_magazin;
+else
+return '-1';
+end if;
+EXCEPTION
+ WHEN no_data_found then
+   return -1;
 end;
 /
 create or replace function caut_magazin_ore(v_tip varchar2,v_ora date, v_data DATE)
@@ -502,9 +512,11 @@ end;
 create or replace function ora_libera_magazin(p_id_f int, p_id_s int, p_data varchar2, p_ora varchar2) return int as
 v_id int;
 BEGIN
-  v_id :=0;
   select count(id) into v_id from programari where id_furnizor=p_id_f and id_serviciu = p_id_s and to_char(data_programare,'dd-mm-yyyy') = p_data and to_char(ora_programare,'hh24:mi') = p_ora;
   return v_id;
+EXCEPTION
+ WHEN no_data_found then
+  return 0;
 END;
 /
 create or replace procedure add_serviciu (p_nume IN VARCHAR2, p_avg_time VARCHAR2) AS
@@ -530,6 +542,11 @@ v_text := CENZURARE_IMPUT(p_text);
 insert into recenzii values(v_in+1,id_client,p_id_fur,p_id_ser,p_rate,v_text,sysdate,sysdate);
 END;
 /
+begin
+add_review(122,32323,123141,2,'asdsafda');
+END;
+
+
 create or replace procedure delete_client(p_id IN NUMBER) AS
 BEGIN
 delete from clienti where id=p_id;
@@ -628,11 +645,10 @@ create or replace function login(p_name varchar2,p_pass varchar2) return int as
 v_id int;
 begin
 select id into v_id from clienti where nume=p_name AND pass=p_pass;
-if (v_id>0) then 
   return v_id;
-else 
+EXCEPTION
+  WHEN no_data_found THEN
   return -1;
-end if;
 end;
 /
 begin
